@@ -1,0 +1,229 @@
+<template>
+  <n-modal
+    v-model:show="show"
+    preset="dialog"
+    title="添加种子"
+    label-align="right"
+    :close-on-esc="true"
+    @close="onCancel"
+    style="width: 90%; max-width: 600px"
+  >
+    <n-el class="add-dialog-content">
+      <n-form :model="form" label-placement="left" label-width="120">
+        <n-form-item label="种子文件" required v-if="props.type === 'file'">
+          <n-upload :max="1" accept=".torrent" @change="onFileChange">
+            <n-button>选择种子文件</n-button>
+          </n-upload>
+        </n-form-item>
+        <n-form-item label="磁力链接" v-else>
+          <n-input
+            v-model:value="magnetLink"
+            type="textarea"
+            placeholder="多个磁力链接用换行分隔"
+            :autosize="{
+              minRows: 10
+            }"
+          />
+        </n-form-item>
+
+        <n-form-item label="下载目录">
+          <n-auto-complete
+            v-model:value="form['download-dir']"
+            :options="downloadDirOptions"
+            placeholder="请选择或输入下载目录"
+            clearable
+            :get-show="() => true"
+          />
+        </n-form-item>
+        <n-form-item label="标签">
+          <n-select
+            v-model:value="form.labels"
+            :options="labelsOptions"
+            placeholder="请选择或输入标签"
+            multiple
+            clearable
+            filterable
+            tag
+          />
+        </n-form-item>
+        <n-form-item label="直接开始">
+          <n-switch v-model:value="form.paused" />
+        </n-form-item>
+
+        <n-form-item label="优先级">
+          <n-select
+            v-model:value="form.bandwidthPriority"
+            :options="bandwidthPriorityOptions"
+            placeholder="请选择优先级"
+          />
+        </n-form-item>
+        <n-form-item label="顺序下载" v-if="rpcVersion >= 18">
+          <n-switch v-model:value="form.sequential_download" />
+        </n-form-item>
+      </n-form>
+    </n-el>
+    <template #action>
+      <n-button @click="onCancel" :loading="loading">取消</n-button>
+      <n-button type="primary" @click="onConfirm" :loading="loading" :disabled="!form.metainfo && !magnetLink"
+        >添加</n-button
+      >
+    </template>
+  </n-modal>
+</template>
+
+<script setup lang="ts">
+import type { TorrentAddArgs } from '@/api/rpc'
+import { trpc } from '@/api/trpc'
+import { useSessionStore, useTorrentStore } from '@/store'
+import { sleep } from '@/utils'
+import type { UploadFileInfo } from 'naive-ui'
+import { useMessage } from 'naive-ui'
+
+const torrentStore = useTorrentStore()
+const sessionStore = useSessionStore()
+const rpcVersion = computed(() => sessionStore.rpcVersion)
+const props = defineProps<{
+  type: 'file' | 'magnet'
+}>()
+const show = defineModel<boolean>('show', { required: true })
+const message = useMessage()
+const loading = ref(false)
+const magnetLink = ref('')
+const form = reactive<TorrentAddArgs>({
+  'download-dir': '',
+  labels: [],
+  metainfo: '',
+  paused: true,
+  bandwidthPriority: undefined,
+  sequential_download: false
+})
+
+const bandwidthPriorityOptions = [
+  { label: '低', value: -1 },
+  { label: '普通', value: 0 },
+  { label: '高', value: 1 }
+]
+
+const downloadDirOptions = computed(() =>
+  torrentStore.downloadDirOptions
+    .filter((item: any) => item.key !== 'all')
+    .map((item: any) => ({
+      label: item.label.replace(/（.*?）/, ''),
+      value: item.key
+    }))
+)
+const labelsOptions = computed(() =>
+  torrentStore.labelsOptions
+    .filter((item: any) => item.key !== 'all' && item.key !== 'noLabels')
+    .map((item: any) => ({
+      label: item.label.replace(/（.*?）/, ''),
+      value: item.key
+    }))
+)
+
+async function onFileChange(data: { file: UploadFileInfo }) {
+  const rawFile = data.file.file as File | undefined
+  if (!rawFile) {
+    return
+  }
+  try {
+    const arrayBuffer = await rawFile.arrayBuffer()
+    form.metainfo = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)))
+  } catch {
+    message.error('读取文件失败')
+    form.metainfo = ''
+  }
+}
+
+function onCancel() {
+  show.value = false
+}
+
+async function addTask(metainfo: string, filename?: string) {
+  try {
+    const res = await trpc.torrentAdd({
+      'download-dir': form['download-dir']?.trim(),
+      filename: filename,
+      labels: form.labels,
+      metainfo: metainfo,
+      paused: !form.paused,
+      bandwidthPriority: form.bandwidthPriority,
+      sequential_download: form.sequential_download
+    })
+    show.value = false
+    console.debug('添加种子', res)
+    if (res.arguments['torrent-duplicate']) {
+      message.warning('种子已存在')
+      return
+    } else {
+      message.success('添加成功')
+      await sleep(1000)
+      await torrentStore.fetchTorrents()
+    }
+  } catch {
+    message.error('添加失败')
+  }
+}
+
+async function onConfirm() {
+  if (props.type === 'file') {
+    if (!form.metainfo) {
+      message.error('请先选择种子文件')
+      return
+    }
+    if (!form['download-dir']) {
+      message.error('请选择下载目录')
+      return
+    }
+    try {
+      loading.value = true
+      await addTask(form.metainfo)
+    } catch {
+    } finally {
+      loading.value = false
+    }
+  } else {
+    if (!magnetLink.value) {
+      message.error('请输入磁力链接')
+      return
+    }
+    // 解析磁力链接
+    const magnetLinks = magnetLink.value.split('\n').map((item) => item.trim())
+    try {
+      loading.value = true
+      await Promise.all(
+        magnetLinks.map(async (magnetLink) => {
+          return await addTask('', magnetLink)
+        })
+      )
+    } catch (error) {
+      console.error(error)
+    } finally {
+      loading.value = false
+    }
+  }
+}
+
+watch(show, (v) => {
+  if (v) {
+    const dir = sessionStore.session?.['download-dir']
+    Object.assign(form, {
+      'download-dir': dir,
+      labels: [],
+      metainfo: '',
+      paused: true,
+      bandwidthPriority: undefined,
+      sequential_download: false
+    })
+  }
+})
+</script>
+
+<style lang="less" scoped>
+@import '@/styles/mix.less';
+.add-dialog-content {
+  max-height: calc(100vh - 200px);
+  overflow: auto;
+  .scrollbar();
+}
+</style>

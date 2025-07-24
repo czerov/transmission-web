@@ -1,0 +1,276 @@
+<template>
+  <div class="h-full flex items-center justify-between flex-1">
+    <!-- 左侧按钮分组 -->
+    <div class="flex items-center gap-4 hidden md:flex">
+      <!-- 组1：添加磁力链接、添加种子 -->
+      <div class="group-item">
+        <IconButton :icon="Magnet" tooltip="磁力链接" @click="onAddMagnet" :color="theme.primaryColor" />
+        <IconButton :icon="AddCircle" tooltip="添加种子" @click="onAddTorrent" :color="theme.primaryColor" />
+      </div>
+      <!-- 组2：开始、暂停、删除 -->
+      <div class="group-item">
+        <IconButton
+          :icon="CaretForwardCircle"
+          tooltip="开始任务"
+          @click="onStart"
+          :disabled="!torrentStore.selectedKeys.length"
+          :color="theme.successColor"
+        />
+        <IconButton
+          :icon="PauseCircle"
+          tooltip="暂停任务"
+          @click="onPause"
+          :disabled="!torrentStore.selectedKeys.length"
+          :color="theme.warningColor"
+        />
+        <IconButton
+          :icon="DismissSquareIcon"
+          tooltip="删除任务"
+          @click="onRemove"
+          :color="theme.errorColor"
+          :disabled="!torrentStore.selectedKeys.length"
+        />
+      </div>
+      <!-- 组3：上移、下移、修改目录、标签、优先级（用 slot 传递占位图标） -->
+      <div class="group-item">
+        <IconButton
+          tooltip="上移动任务"
+          @click="onMoveUp"
+          :disabled="!torrentStore.selectedKeys.length"
+          :icon="ArrowUpCircleSharp"
+          :color="theme.infoColor"
+        />
+        <IconButton
+          tooltip="下移动任务"
+          @click="onMoveDown"
+          :disabled="!torrentStore.selectedKeys.length"
+          :icon="ArrowDownCircleSharp"
+          :color="theme.infoColor"
+        />
+      </div>
+      <div class="group-item">
+        <IconButton
+          tooltip="修改任务目录"
+          @click="onChangeDir"
+          :disabled="!torrentStore.selectedKeys.length"
+          :icon="FolderOpenSharp"
+          :color="theme.warningColor"
+        />
+        <IconButton
+          tooltip="修改任务标签"
+          @click="onChangeLabel"
+          :disabled="!torrentStore.selectedKeys.length"
+          :icon="Pricetags"
+          :color="theme.infoColor"
+        />
+        <n-dropdown
+          :options="priorityOptions"
+          @select="onSelectPriority"
+          trigger="hover"
+          :disabled="!torrentStore.selectedKeys.length"
+        >
+          <n-button
+            quaternary
+            circle
+            size="large"
+            v-bind="$attrs"
+            v-on="$attrs"
+            :disabled="!torrentStore.selectedKeys.length"
+          >
+            <n-icon :component="StarSharp" size="24" :color="theme.warningColor" />
+          </n-button>
+        </n-dropdown>
+      </div>
+    </div>
+    <!-- 种子操作下拉菜单：md及以下显示 -->
+    <div class="md:hidden">
+      <MobileActionDropdown
+        v-model:search="torrentStore.search"
+        :selected-keys="torrentStore.selectedKeys"
+        @action="onMobileActionSelect"
+      />
+    </div>
+    <div class="flex-1 mx-2">
+      <!-- 搜索框 -->
+      <n-input v-model:value="torrentStore.search" placeholder="搜索任务名称" class="max-w-[600px]" clearable />
+    </div>
+    <!-- 右侧设置按钮 -->
+    <div class="flex items-center">
+      <IconButton tooltip="设置" @click="onSetting" :icon="SettingsSharp" :color="theme.primaryColor" />
+    </div>
+    <DeleteTorrentDialog v-model:show="showDeleteDialog" />
+    <AddDialog v-model:show="showAddMagnetDialog" :type="addDialogType" />
+    <ChangeDirDialog v-model:show="showChangeDirDialog" />
+    <ChangeLables v-model:show="showChangeLabelDialog" />
+  </div>
+</template>
+<script setup lang="ts">
+import DismissSquareIcon from '@/assets/icons/dismissSquare.svg?component'
+import { useTorrentStore } from '@/store'
+import {
+  AddCircle,
+  CaretForwardCircle,
+  Magnet,
+  PauseCircle,
+  ArrowUpCircleSharp,
+  ArrowDownCircleSharp,
+  FolderOpenSharp,
+  StarSharp,
+  Pricetags,
+  SettingsSharp
+} from '@vicons/ionicons5'
+import { useThemeVars } from 'naive-ui'
+import { rpc } from '@/api/rpc'
+import { useMessage } from 'naive-ui'
+import { sleep } from '@/utils'
+import { priorityOptions } from './priority'
+
+const torrentStore = useTorrentStore()
+const theme = useThemeVars()
+const message = useMessage()
+const addDialogType = ref<'file' | 'magnet'>('file')
+const showDeleteDialog = ref(false)
+const showAddMagnetDialog = ref(false)
+const showChangeDirDialog = ref(false)
+const showChangeLabelDialog = ref(false)
+const onAddMagnet = () => {
+  addDialogType.value = 'magnet'
+  showAddMagnetDialog.value = true
+}
+
+const onAddTorrent = () => {
+  addDialogType.value = 'file'
+  showAddMagnetDialog.value = true
+}
+
+const onStart = async () => {
+  if (!torrentStore.selectedKeys.length) {
+    return
+  }
+  await rpc.torrentStart(torrentStore.selectedKeys)
+  await sleep(1000)
+  await torrentStore.fetchTorrents()
+  message.success('已开始任务')
+}
+
+const onPause = async () => {
+  if (!torrentStore.selectedKeys.length) {
+    return
+  }
+  await rpc.torrentStop(torrentStore.selectedKeys)
+  await sleep(1000)
+  await torrentStore.fetchTorrents()
+  message.success('已暂停任务')
+}
+
+const onRemove = () => {
+  if (!torrentStore.selectedKeys.length) {
+    return
+  }
+  showDeleteDialog.value = true
+}
+
+const onMoveUp = async () => {
+  if (!torrentStore.selectedKeys.length) {
+    return
+  }
+  await rpc.queueMoveUp(torrentStore.selectedKeys)
+  await torrentStore.fetchTorrents()
+  message.success('已上移任务')
+}
+
+const onMoveDown = async () => {
+  if (!torrentStore.selectedKeys.length) {
+    return
+  }
+  await rpc.queueMoveDown(torrentStore.selectedKeys)
+  await torrentStore.fetchTorrents()
+  message.success('已下移任务')
+}
+
+const onChangeDir = () => {
+  showChangeDirDialog.value = true
+}
+
+const onChangeLabel = () => {
+  showChangeLabelDialog.value = true
+}
+
+const onSelectPriority = async (priority: number) => {
+  if (!torrentStore.selectedKeys.length) {
+    return
+  }
+  try {
+    await rpc.torrentSet({
+      ids: torrentStore.selectedKeys,
+      bandwidthPriority: priority
+    })
+    message.success('优先级已修改')
+    await torrentStore.fetchTorrents()
+  } catch (error) {
+    console.error(error)
+    message.error('修改优先级失败')
+  }
+}
+
+const onSetting = () => {}
+
+const onMobileActionSelect = async (key: string) => {
+  switch (key) {
+    case 'addMagnet':
+      onAddMagnet()
+      break
+    case 'addTorrent':
+      onAddTorrent()
+      break
+    case 'start':
+      await onStart()
+      break
+    case 'pause':
+      await onPause()
+      break
+    case 'remove':
+      onRemove()
+      break
+    case 'moveUp':
+      await onMoveUp()
+      break
+    case 'moveDown':
+      await onMoveDown()
+      break
+    case 'changeDir':
+      onChangeDir()
+      break
+    case 'changeLabel':
+      onChangeLabel()
+      break
+    case 'priority1':
+      await onSelectPriority(1)
+      break
+    case 'priority0':
+      await onSelectPriority(0)
+      break
+    case 'priority-1':
+      await onSelectPriority(-1)
+      break
+  }
+}
+</script>
+
+<script lang="ts">
+export default {
+  name: 'AppHeader'
+}
+</script>
+
+<style lang="less" scoped>
+.group-item {
+  gap: 6px;
+  display: flex;
+  align-items: center;
+  border-left: 1px solid var(--border-color);
+  &:first-child {
+    border-left: none;
+  }
+}
+</style>

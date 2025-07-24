@@ -1,0 +1,100 @@
+{
+  "name": "transmission-web",
+  "version": "1.0.0",
+  "description": "🚀 现代化的 Transmission BitTorrent 客户端 Web 界面，基于 Vue 3 + TypeScript 构建，支持响应式设计、虚拟滚动和智能过滤功能",
+  "type": "module",
+  "keywords": [
+    "vue3",
+    "typescript",
+    "transmission",
+    "bittorrent",
+    "torrent",
+    "download-manager",
+    "naive-ui",
+    "vite",
+    "pinia",
+    "responsive-design",
+    "web-interface",
+    "vue-composition-api",
+    "virtual-scrolling",
+    "torrent-client",
+    "p2p",
+    "modern-ui"
+  ],
+  "homepage": "https://github.com/your-username/transmission-web",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/transmission-web.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/transmission-web/issues"
+  },
+  "license": "MIT",
+  "author": "Your Name <your.email@example.com>",
+  "scripts": {
+    "dev": "vite",
+    "check": "vue-tsc -b",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .ts,.vue --fix",
+    "lint:fix": "eslint . --ext .ts,.vue --fix"
+  },
+  "dependencies": {
+    "@any-touch/vue3": "^2.2.0",
+    "@unocss/preset-attributify": "^66.3.2",
+    "@unocss/preset-icons": "^66.3.2",
+    "@unocss/preset-uno": "^66.3.2",
+    "@unocss/vite": "^66.3.2",
+    "@vicons/ionicons5": "^0.13.0",
+    "@vueuse/core": "^13.5.0",
+    "any-touch": "^2.2.0",
+    "autoprefixer": "^10.4.21",
+    "axios": "^1.10.0",
+    "dayjs": "^1.11.13",
+    "i": "^0.3.7",
+    "less": "^4.3.0",
+    "lodash-es": "^4.17.21",
+    "naive-ui": "^2.42.0",
+    "parse-torrent": "^11.0.18",
+    "pinia": "^3.0.3",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.11",
+    "unocss": "^66.3.2",
+    "vue": "^3.5.17",
+    "vue-router": "^4.5.1",
+    "vue-virtual-scroller": "2.0.0-beta.8",
+    "vuedraggable": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
+    "@types/node": "^24.0.10",
+    "@types/parse-torrent": "^5.8.7",
+    "@typescript-eslint/eslint-plugin": "^8.35.1",
+    "@typescript-eslint/parser": "^8.35.1",
+    "@unocss/postcss": "^66.3.2",
+    "@unocss/preset-wind4": "^66.3.2",
+    "@unocss/transformer-directives": "^66.3.2",
+    "@vitejs/plugin-vue": "^6.0.0",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "@vue/eslint-config-typescript": "^14.6.0",
+    "@vue/tsconfig": "^0.7.0",
+    "eslint": "^9.30.1",
+    "eslint-plugin-oxlint": "^1.5.0",
+    "eslint-plugin-vue": "^10.2.0",
+    "prettier": "^3.6.2",
+    "prettier-eslint": "^16.4.2",
+    "skip-formatting": "link:@vue/eslint-config-prettier/skip-formatting",
+    "typescript": "~5.8.3",
+    "unplugin-auto-import": "^19.3.0",
+    "unplugin-vue-components": "^28.8.0",
+    "vfonts": "^0.1.0",
+    "vite": "^7.0.0",
+    "vite-svg-loader": "^5.1.0",
+    "vue-tsc": "^2.2.10"
+  },
+  "pnpm": {
+    "overrides": {
+      "vite": "npm:rolldown-vite@latest"
+    }
+  }
+}
