@@ -45,12 +45,13 @@ function getStatusIcon(row: Torrent, theme: ThemeCommonVars & CustomThemeCommonV
   if (row.status === 0 /* stopped */ && row.sizeWhenDone > 0 && row.leftUntilDone == 0) {
     return getIcon('check', '#888')
   }
+
   // 其它状态
   switch (row.status) {
     case 0: // stopped
       return getIcon('pause', '#888')
     case 4: // downloading
-      return getIcon('CaretDownCircle', '#748ffc')
+      return getIcon('caretDownCircle', '#748ffc')
     case 6: // seeding
       return getIcon('caretUpCircle', '#10b981')
     case 2: // verifying

@@ -351,6 +351,8 @@ export interface Torrent extends TorrentOther {
   seedIdleMode?: number
   /** 种子级别的分享率 */
   seedRatioLimit?: number
+  /** 是否启用种子级别的分享率限制 */
+  seedRatioLimited?: boolean
   /** 使用哪种分享率模式。参见 tr_ratiolimit */
   // Use global (0), torrent (1), or unlimited (2) limit.
   seedRatioMode?: number

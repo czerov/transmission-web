@@ -2,6 +2,7 @@ import type { Torrent } from '@/api/rpc'
 import { rpc } from '@/api/rpc'
 import { useColumns } from '@/composables/useColumns'
 import { useSelection } from '@/composables/useSelection'
+import { useSettingStore } from '@/store/setting'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import {
@@ -15,6 +16,7 @@ import {
 
 export const useTorrentStore = defineStore('torrent', () => {
   const torrents = ref<Torrent[]>([])
+  const settingStore = useSettingStore()
   // 排序相关
   const sortKey = ref<string>('id') // 默认按添加时间排序
   const sortOrder = ref<'asc' | 'desc'>('desc') // 默认降序
@@ -183,7 +185,8 @@ export const useTorrentStore = defineStore('torrent', () => {
     torrents.value = (res?.arguments?.torrents || []).map(processTorrent)
   }
 
-  const { pause: stopPolling, resume: startPolling } = useIntervalFn(fetchTorrents, 5000, { immediate: false })
+  const interval = computed(() => settingStore.setting.polling.torrentInterval * 1000)
+  const { pause: stopPolling, resume: startPolling } = useIntervalFn(fetchTorrents, interval, { immediate: false })
 
   watch([search, statusFilter, labelsFilter, trackerFilter, errorStringFilter, downloadDirFilter], () => {
     clearSelectedKeys()

@@ -393,6 +393,8 @@ function handleLongtap(e: AnyTouchEvent) {
 }
 
 function onKeyDown(event: KeyboardEvent) {
+  console.log('onKeyDown', event)
+  event.preventDefault()
   const isCmdOrCtrl = isMac() ? event.metaKey : event.ctrlKey
   const isKeyA = event.key.toLowerCase() === 'a' // 忽略大小写
   if (isCmdOrCtrl && isKeyA) {

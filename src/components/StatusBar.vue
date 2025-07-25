@@ -33,7 +33,7 @@
   <AboutDialog v-model:show="showAbout" :version="session?.['version']" :server="serverHost" author="..." />
 </template>
 <script setup lang="ts">
-import { useSessionStore, useSettingStore, useStatsStore, useTorrentStore } from '@/store'
+import { useSessionStore, useSettingStore, useTorrentStore } from '@/store'
 import { formatSize, formatSpeed } from '@/utils'
 import { InformationCircle as InfoIcon, Moon as MoonIcon, Sunny as SunIcon } from '@vicons/ionicons5'
 
@@ -44,12 +44,26 @@ const props = defineProps<{
 const sessionStore = useSessionStore()
 const torrentStore = useTorrentStore()
 const settingStore = useSettingStore()
-const statsStore = useStatsStore()
 
-const stats = computed(() => statsStore.stats)
 const session = computed(() => sessionStore.session)
 const torrents = computed(() => torrentStore.torrents)
 const totalSize = computed(() => torrents.value.reduce((sum, t) => sum + (t.sizeWhenDone || 0), 0))
+
+const computedFields = computed(() => {
+  return torrents.value.reduce(
+    (prev, t) => {
+      prev.totalSize += t.sizeWhenDone || 0
+      prev.downRate += t.rateDownload || 0
+      prev.upRate += t.rateUpload || 0
+      return prev
+    },
+    {
+      totalSize: 0,
+      downRate: 0,
+      upRate: 0
+    }
+  )
+})
 const selectedKeys = computed(() => torrentStore.selectedKeys || [])
 const selectedSize = computed(() => {
   if (!selectedKeys.value.length) {
@@ -103,14 +117,13 @@ const allTags = computed(() => [
   { text: `TR版本: ${session.value?.['version'] ?? '--'}`, type: 'info' as const },
   { text: `服务器: ${serverHost.value}`, type: 'info' as const },
   {
-    text: `↑ 上传: ${formatSpeed(stats.value?.uploadSpeed)} (${formatSpeed(limit.value.upRateLimit * 1024)})`,
+    text: `↑ 上传: ${formatSpeed(computedFields.value.upRate)} (${formatSpeed(limit.value.upRateLimit * 1024)})`,
     type: 'success' as const
   },
   {
-    text: `↓ 下载: ${formatSpeed(stats.value?.downloadSpeed)} (${formatSpeed(limit.value.downRateLimit * 1024)})`,
+    text: `↓ 下载: ${formatSpeed(computedFields.value.downRate)} (${formatSpeed(limit.value.downRateLimit * 1024)})`,
     type: 'info' as const
   },
-  { text: `连接数: ${stats.value?.activeTorrentCount ?? '--'}`, type: 'default' as const },
   { text: `文件总大小: ${formatSize(totalSize.value)}`, type: 'info' as const },
   ...(selectedSize.value > 0 ? [{ text: `选中大小: ${formatSize(selectedSize.value)}`, type: 'info' as const }] : [])
 ])

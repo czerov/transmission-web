@@ -102,6 +102,7 @@
     <AddDialog v-model:show="showAddMagnetDialog" :type="addDialogType" />
     <ChangeDirDialog v-model:show="showChangeDirDialog" />
     <ChangeLables v-model:show="showChangeLabelDialog" />
+    <SettingsDialog v-model:show="showSettingsDialog" />
   </div>
 </template>
 <script setup lang="ts">
@@ -124,6 +125,8 @@ import { rpc } from '@/api/rpc'
 import { useMessage } from 'naive-ui'
 import { sleep } from '@/utils'
 import { priorityOptions } from './priority'
+import SettingsDialog from '../dialog/settings/SettingsDialog.vue'
+import { useIsSmallScreen } from '@/composables/useIsSmallScreen'
 
 const torrentStore = useTorrentStore()
 const theme = useThemeVars()
@@ -133,6 +136,9 @@ const showDeleteDialog = ref(false)
 const showAddMagnetDialog = ref(false)
 const showChangeDirDialog = ref(false)
 const showChangeLabelDialog = ref(false)
+const showSettingsDialog = ref(false)
+const isMobile = useIsSmallScreen()
+const router = useRouter()
 const onAddMagnet = () => {
   addDialogType.value = 'magnet'
   showAddMagnetDialog.value = true
@@ -213,7 +219,15 @@ const onSelectPriority = async (priority: number) => {
   }
 }
 
-const onSetting = () => {}
+const onSetting = () => {
+  if (isMobile.value) {
+    // 移动端跳转到设置页面
+    router.push('/settings')
+  } else {
+    // PC端显示设置弹窗
+    showSettingsDialog.value = true
+  }
+}
 
 const onMobileActionSelect = async (key: string) => {
   switch (key) {

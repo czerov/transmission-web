@@ -70,11 +70,12 @@ function onSidebarToggle() {
 
 onMounted(async () => {
   loading.value = true
-  // torrentStore.startPolling()
+  torrentStore.startPolling()
   // statsStore.startPolling()
   await sessionStore.fetchSession()
   await torrentStore.fetchTorrents()
   await statsStore.fetchStats()
+  sessionStore.startPolling()
   loading.value = false
 })
 

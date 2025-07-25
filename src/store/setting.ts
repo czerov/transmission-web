@@ -26,6 +26,12 @@ const DEFAULT_TRACKERS = [
   'udp://open.dstud.io:6969/announce'
 ]
 
+export interface IPolling {
+  sessionInterval: number
+  torrentDetailInterval: number
+  torrentInterval: number
+}
+
 export const useSettingStore = defineStore('setting', () => {
   const setting = useStorage(
     'setting',
@@ -34,7 +40,12 @@ export const useSettingStore = defineStore('setting', () => {
       defaultTrackers: DEFAULT_TRACKERS,
       domain: window.location.origin,
       savePassword: false,
-      auth: ''
+      auth: '',
+      polling: {
+        sessionInterval: 60,
+        torrentDetailInterval: 5,
+        torrentInterval: 5
+      }
     },
     localStorage,
     { mergeDefaults: true, deep: true, writeDefaults: true }
@@ -76,10 +87,6 @@ export const useSettingStore = defineStore('setting', () => {
     setting.value.theme = val
   }
 
-  function setDefaultTrackers(val: string[]) {
-    setting.value.defaultTrackers = val
-  }
-
   function setThemeVars(val: ThemeCommonVars & CustomThemeCommonVars) {
     themeVars.value = val
   }
@@ -108,6 +115,10 @@ export const useSettingStore = defineStore('setting', () => {
     }
   }
 
+  function setPolling(val: IPolling) {
+    setting.value.polling = val
+  }
+
   watch(
     [() => authSession.value, () => setting.value.auth],
     () => {
@@ -122,7 +133,6 @@ export const useSettingStore = defineStore('setting', () => {
   return {
     setting,
     setTheme,
-    setDefaultTrackers,
     themeVars,
     setThemeVars,
     safeArea,
@@ -130,6 +140,7 @@ export const useSettingStore = defineStore('setting', () => {
     serverHost,
     setDomain,
     setAuth,
-    setSavePassword
+    setSavePassword,
+    setPolling
   }
 })

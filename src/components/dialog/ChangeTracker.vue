@@ -31,13 +31,14 @@
 </template>
 <script setup lang="ts">
 import { useMessage } from 'naive-ui'
-import { useSettingStore, useTorrentStore } from '@/store'
+import { useSettingStore, useTorrentStore, useSessionStore } from '@/store'
 import { rpc } from '@/api/rpc'
 
 const show = defineModel<boolean>('show', { required: true })
 const message = useMessage()
 const torrentStore = useTorrentStore()
 const settingStore = useSettingStore()
+const sessionStore = useSessionStore()
 const loading = ref(false)
 const localSelectedKeys = ref<number[]>([])
 const tracker = ref<string>('')
@@ -72,7 +73,10 @@ function onCancel() {
   show.value = false
 }
 function onAddTracker() {
-  const defaultTrackers = settingStore.setting.defaultTrackers
+  let defaultTrackers = settingStore.setting.defaultTrackers
+  if (sessionStore.session?.['default-trackers']) {
+    defaultTrackers = sessionStore.session?.['default-trackers'].split('\n')
+  }
   const trackerList = tracker.value.split('\n')
   if (defaultTrackers) {
     tracker.value = [...new Set([...trackerList, ...defaultTrackers])].join('\n')

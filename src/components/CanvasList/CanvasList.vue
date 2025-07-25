@@ -4,6 +4,7 @@
       <TorrentListHeader v-model:showHeaderMenu="showHeaderMenu" is-sticky-select-all />
       <CanvasTableBody ref="canvasTableBodyRef" />
       <div
+        tabindex="-1"
         :style="{ height: tableStore.scrollHeight + 'px', width: torrentStore.tableMinWidth + 'px' }"
         class="canvas-list-scroll-holder"
         @mousemove="canvasTableBodyRef?.onMouseMove"
