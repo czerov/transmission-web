@@ -1,6 +1,6 @@
 <template>
   <div class="canvas-list-warpper" ref="canvasListWrapperRef">
-    <div class="canvas-list-container" :style="{ height: debouncedListheight + 'px' }" @scroll="onScroll">
+    <div class="canvas-list-container" ref="canvasListContainerRef" @scroll="onScroll">
       <TorrentListHeader v-model:showHeaderMenu="showHeaderMenu" is-sticky-select-all />
       <CanvasTableBody ref="canvasTableBodyRef" />
       <div
@@ -24,19 +24,32 @@ import CanvasTableBody from './CanvasTableBody.vue'
 import { useTableStore } from './store/tableStore'
 import type { AnyTouchEvent } from 'any-touch'
 import { HEADER_HEIGHT } from './store/utils'
+
+const props = defineProps<{
+  listHeight: number
+}>()
 // 移除 useThrottleFn 的引入
 const showHeaderMenu = ref(false)
 const bodyRef = ref(document.body)
-const listheight = ref(document.documentElement.clientHeight - 56 - 32)
-const debouncedListheight = debouncedRef(listheight, 50)
 const torrentStore = useTorrentStore()
 const tableStore = useTableStore()
 const canvasTableBodyRef = useTemplateRef<InstanceType<typeof CanvasTableBody>>('canvasTableBodyRef')
 const canvasListWrapperRef = useTemplateRef<HTMLElement>('canvasListWrapperRef')
+const canvasListContainerRef = useTemplateRef<HTMLElement>('canvasListContainerRef')
+const bodyHeight = ref(document.body.clientHeight || document.documentElement.clientHeight)
 
 watch(
-  debouncedListheight,
+  () => props.listHeight,
   (newHeight) => {
+    if (canvasListContainerRef.value) {
+      canvasListContainerRef.value.style.height = newHeight + 'px'
+    } else {
+      nextTick(() => {
+        if (canvasListContainerRef.value) {
+          canvasListContainerRef.value.style.height = newHeight + 'px'
+        }
+      })
+    }
     // 去掉固定的table header
     tableStore.setClientHeight(newHeight - HEADER_HEIGHT)
   },
@@ -77,12 +90,12 @@ onBeforeUnmount(() => {
   lastScrollEvent = null
 })
 
-useResizeObserver([canvasListWrapperRef], () => {
-  tableStore.setClientWidth(canvasListWrapperRef.value?.clientWidth!)
+useResizeObserver(bodyRef, () => {
+  bodyHeight.value = bodyRef.value?.clientHeight!
 })
 
-useResizeObserver([bodyRef], () => {
-  listheight.value = bodyRef.value?.clientHeight! - 56 - 32
+useResizeObserver([canvasListWrapperRef], () => {
+  tableStore.setClientWidth(canvasListWrapperRef.value?.clientWidth!)
 })
 
 onMounted(() => {

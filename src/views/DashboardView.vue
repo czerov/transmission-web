@@ -6,19 +6,31 @@
       <n-button quaternary circle @click="onSidebarToggle">
         <n-icon size="20" :component="LayoutSidebarLeftOpen" />
       </n-button>
-      <AppHeader />
+      <AppHeader @layoutBottom="onLayoutBottom" />
     </n-layout-header>
 
     <!-- Sidebar (PC) 可拖拽宽度 -->
     <div v-if="!isMobile" :class="$style['sidebar-container']">
       <SidebarView :class="$style.sidebar" />
-      <ResizeLine v-model:container-width="sidebarWidth" :min-container-width="120" :max-container-width="600" />
+      <ResizeLine
+        v-model:container-width="settingStore.sidebarWidth"
+        :min-container-width="120"
+        :max-container-width="600"
+      />
     </div>
 
     <!-- Main Content -->
     <main :class="$style.content">
-      <!-- <TorrentList /> -->
-      <CanvasList />
+      <CanvasList :list-height="listheight" />
+      <div v-if="!isMobile" :class="$style['detail-container']" ref="detailContainerRef">
+        <template v-if="pcDetailVisible">
+          <ResizeHorizontalLine
+            v-model:container-height="settingStore.detailHeight"
+            :min-container-height="120"
+            :max-container-height="600" />
+          <TorrentDetail :height="settingStore.detailHeight" :loading="loadingDetail"
+        /></template>
+      </div>
     </main>
 
     <!-- Footer -->
@@ -38,26 +50,83 @@
         <SidebarView :class="$style.sidebar" />
       </n-drawer-content>
     </n-drawer>
+
+    <!-- 移动端 详情抽屉（从右侧） -->
+    <n-drawer
+      v-if="isMobile"
+      v-model:show="mobileDetailVisible"
+      placement="right"
+      width="92vw"
+      to="body"
+      :mask-closable="true"
+    >
+      <n-drawer-content :body-content-class="$style['drawer-mobile-detail']">
+        <TorrentDetail closable @close="onCloseDetail" :loading="loadingDetail" />
+      </n-drawer-content>
+    </n-drawer>
   </div>
 </template>
 <script setup lang="ts">
 import LayoutSidebarLeftOpen from '@/assets/icons/layoutSidebarLeft.svg?component'
 import { useIsSmallScreen } from '@/composables/useIsSmallScreen'
-import { useStatsStore, useTorrentStore } from '@/store'
+import { useSettingStore, useStatsStore, useTorrentStore } from '@/store'
 import { useSessionStore } from '@/store/session'
 const torrentStore = useTorrentStore()
 const statsStore = useStatsStore()
 const sessionStore = useSessionStore()
+const settingStore = useSettingStore()
 const loading = ref(true)
 const drawerVisible = ref(false)
 const isMobile = useIsSmallScreen()
-const siderBarVisible = useLocalStorage('siderBarVisible', true)
-const sidebarWidth = useStorage('sidebarWidth', 224, undefined)
+const siderBarVisible = useLocalStorage<boolean>('siderBarVisible', true)
+const detailContainerRef = useTemplateRef<HTMLElement>('detailContainerRef')
+const pcDetailVisible = useLocalStorage<boolean>('pcDetailVisible', !isMobile.value)
+
+const mobileDetailVisible = computed({
+  get: () => isMobile.value && torrentStore.selectedKeys.length > 0,
+  set: (val: boolean) => {
+    if (!val) {
+      torrentStore.clearSelectedKeys()
+    }
+  }
+})
+const loadingDetail = ref(false)
+
+const bodyHeight = ref(document.body.clientHeight || document.documentElement.clientHeight)
+
+const listheight = computed(() => {
+  const detailHeight = !isMobile.value && pcDetailVisible.value ? settingStore.detailHeight : 0
+  return bodyHeight.value - settingStore.headerHeight - settingStore.footerHeight - detailHeight
+})
+
+watchEffect(() => {
+  if (detailContainerRef.value && pcDetailVisible.value) {
+    detailContainerRef.value.style.transform = `translateY(${listheight.value}px)`
+  }
+})
+
+watch([pcDetailVisible, mobileDetailVisible, () => torrentStore.selectedKeys], () => {
+  if (pcDetailVisible.value || mobileDetailVisible.value) {
+    loadingDetail.value = true
+    torrentStore.fetchDetails().finally(() => {
+      loadingDetail.value = false
+    })
+    torrentStore.startDetailPolling()
+  } else {
+    torrentStore.stopDetailPolling()
+  }
+})
+
+const scrollContainer = ref<HTMLElement>(document.body)
+useResizeObserver(scrollContainer, () => {
+  bodyHeight.value = scrollContainer.value?.clientHeight!
+})
+
 const girdLayout = computed(() => {
   if (isMobile.value || !siderBarVisible.value) {
     return '0px 1fr'
   }
-  return `${sidebarWidth.value}px 1fr`
+  return `${settingStore.sidebarWidth}px 1fr`
 })
 
 function onSidebarToggle() {
@@ -65,6 +134,18 @@ function onSidebarToggle() {
     drawerVisible.value = !drawerVisible.value
   } else {
     siderBarVisible.value = !siderBarVisible.value
+  }
+}
+
+function onCloseDetail() {
+  torrentStore.clearSelectedKeys()
+}
+
+function onLayoutBottom() {
+  if (isMobile.value) {
+    pcDetailVisible.value = false
+  } else {
+    pcDetailVisible.value = !pcDetailVisible.value
   }
 }
 
@@ -131,8 +212,10 @@ onUnmounted(() => {
   grid-column: 2 / 3;
   min-width: 0;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
+  position: relative;
 }
+
 .footer {
   grid-row: 3 / 4;
   grid-column: 1 / -1;
@@ -142,11 +225,21 @@ onUnmounted(() => {
   align-items: center;
 }
 
+.detail-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+
 .drawer-sidebar {
   height: 100vh;
   height: 100dvh;
   padding-top: var(--top-inset);
   padding-bottom: var(--bottom-inset);
   overflow: hidden;
+}
+.drawer-mobile-detail {
+  padding: 12px 4px !important;
 }
 </style>

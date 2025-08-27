@@ -8,7 +8,7 @@
     <div
       class="torrent-table-header-cell-checkbox"
       :class="{ 'torrent-table-header-cell-checkbox-sticky': isStickySelectAll }"
-      v-if="isSmallLg"
+      v-if="isSupportTouch"
     >
       <n-checkbox
         :checked="torrentStore.selectedKeys.length === torrentStore.filterTorrents.length"
@@ -50,8 +50,8 @@
 </template>
 <script setup lang="ts">
 import { allColumns } from '@/composables/useColumns'
-import { useIsSmallLg } from '@/composables/useIsSmallScreen'
 import { useTorrentStore } from '@/store'
+import { isSupportTouch } from '@/utils/evt'
 import { CaretDown, CaretUp } from '@vicons/ionicons5'
 import type { AnyTouchEvent } from 'any-touch'
 
@@ -67,9 +67,8 @@ withDefaults(
 const torrentStore = useTorrentStore()
 const visibleColumns = computed(() => torrentStore.visibleColumns)
 const tableMinWidth = computed(() => torrentStore.tableMinWidth)
-const isSmallLg = useIsSmallLg()
 const width = computed(() => {
-  return (isSmallLg.value ? tableMinWidth.value + 24 : tableMinWidth.value) + 'px'
+  return (isSupportTouch ? tableMinWidth.value + 24 : tableMinWidth.value) + 'px'
 })
 const minColumnWidth = computed(() => {
   return allColumns.reduce(

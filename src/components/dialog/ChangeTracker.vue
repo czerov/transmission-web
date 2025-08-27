@@ -43,14 +43,19 @@ const loading = ref(false)
 const localSelectedKeys = ref<number[]>([])
 const tracker = ref<string>('')
 
+const props = defineProps<{
+  ids?: number[]
+}>()
+
 watch(
   () => show.value,
   (v) => {
     if (v) {
       // 默认目录为 sessionStore.session?.['download-dir'] 或第一个选中种子的 downloadDir
-      const firstTorrent = torrentStore.torrents.find((t) => torrentStore.selectedKeys.includes(t.id))
+      localSelectedKeys.value = [...(props.ids ? props.ids : torrentStore.selectedKeys)]
+      const firstTorrent = torrentStore.torrents.find((t) => localSelectedKeys.value.includes(t.id))
       tracker.value = firstTorrent?.trackerList || firstTorrent?.trackerStats.map((t) => t.announce).join('\n') || ''
-      localSelectedKeys.value = [...torrentStore.selectedKeys]
+      console.debug(localSelectedKeys.value)
     } else {
       localSelectedKeys.value = []
     }

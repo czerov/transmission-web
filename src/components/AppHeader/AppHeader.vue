@@ -97,6 +97,13 @@
     <!-- 右侧设置按钮 -->
     <div class="flex items-center">
       <IconButton tooltip="设置" @click="onSetting" :icon="SettingsSharp" :color="theme.primaryColor" />
+      <IconButton
+        v-if="!isMobile"
+        tooltip="详情"
+        @click="onLayoutBottom"
+        :icon="LayoutBottom"
+        :color="theme.primaryColor"
+      />
     </div>
     <DeleteTorrentDialog v-model:show="showDeleteDialog" />
     <AddDialog v-model:show="showAddMagnetDialog" :type="addDialogType" />
@@ -107,6 +114,7 @@
 </template>
 <script setup lang="ts">
 import DismissSquareIcon from '@/assets/icons/dismissSquare.svg?component'
+import LayoutBottom from '@/assets/icons/layoutBottom.svg?component'
 import { useTorrentStore } from '@/store'
 import {
   AddCircle,
@@ -127,7 +135,7 @@ import { sleep } from '@/utils'
 import { priorityOptions } from './priority'
 import SettingsDialog from '../dialog/settings/SettingsDialog.vue'
 import { useIsSmallScreen } from '@/composables/useIsSmallScreen'
-
+const emit = defineEmits(['layoutBottom'])
 const torrentStore = useTorrentStore()
 const theme = useThemeVars()
 const message = useMessage()
@@ -227,6 +235,10 @@ const onSetting = () => {
     // PC端显示设置弹窗
     showSettingsDialog.value = true
   }
+}
+
+const onLayoutBottom = () => {
+  emit('layoutBottom')
 }
 
 const onMobileActionSelect = async (key: string) => {

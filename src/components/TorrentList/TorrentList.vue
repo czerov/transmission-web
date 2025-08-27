@@ -10,7 +10,7 @@
     <!-- 虚拟列表 -->
     <DynamicScroller
       :class="$style['torrent-table-scroll']"
-      :style="{ height: debouncedListheight, '--tableWidth': tableMinWidth + 'px' }"
+      :style="{ height: props.listHeight, '--tableWidth': tableMinWidth + 'px' }"
       @scroll="handleScroll"
       :items="filteredTorrents"
       key-field="id"
@@ -44,12 +44,12 @@ import type { AnyTouchEvent } from 'any-touch'
 import { DynamicScroller } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
-const listheight = ref(document.documentElement.clientHeight - 56 - 32 + 'px')
+const props = defineProps<{
+  listHeight: number
+}>()
 const torrentStore = useTorrentStore()
 const showDropdown = ref(false)
 const showHeaderMenu = ref(false)
-const scrollContainer = ref<HTMLElement>(document.body)
-const debouncedListheight = debouncedRef(listheight, 50)
 const rowMenuX = ref(0)
 const rowMenuY = ref(0)
 const tableMinWidth = computed(() => torrentStore.tableMinWidth)
@@ -91,10 +91,6 @@ function onRowClick(e: MouseEvent | TouchEvent) {
     torrentStore.setLastSelectedIndex(index)
   }
 }
-
-useResizeObserver(scrollContainer, () => {
-  listheight.value = document.documentElement.clientHeight - 56 - 32 + 'px'
-})
 
 function handleScroll() {
   if (showHeaderMenu.value) {

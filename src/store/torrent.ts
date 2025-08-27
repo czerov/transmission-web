@@ -14,6 +14,67 @@ import {
   type IMenuItem
 } from './torrentUtils'
 
+const listFields = [
+  'activityDate',
+  'addedDate',
+  'bandwidthPriority',
+  'doneDate',
+  'downloadDir',
+  'downloadedEver',
+  'error',
+  'errorString',
+  'eta',
+  'file-count',
+  'group',
+  'haveValid',
+  'id',
+  'isPrivate',
+  'labels',
+  'leftUntilDone',
+  'magnetLink',
+  'metadataPercentComplete',
+  'name',
+  'peersGettingFromUs',
+  'peersSendingToUs',
+  'percentDone',
+  'pieceCount',
+  'pieceSize',
+  'queuePosition',
+  'rateDownload',
+  'rateUpload',
+  'secondsSeeding',
+  'sizeWhenDone',
+  'status',
+  'totalSize',
+  'trackerStats',
+  'uploadRatio',
+  'uploadedEver',
+  'trackerList',
+  'seedIdleLimit',
+  'seedIdleMode',
+  'seedRatioLimit',
+  'seedRatioMode',
+  'sequential_download',
+  'honorsSessionLimits',
+  'downloadLimited',
+  'uploadLimited',
+  'downloadLimit',
+  'uploadLimit',
+  'peer-limit'
+]
+
+const detailFields = [
+  'hashString',
+  'recheckProgress',
+  'files',
+  'peers',
+  'peersFrom',
+  'creator',
+  'comment',
+  'dateCreated',
+  'maxConnectedPeers'
+]
+
 export const useTorrentStore = defineStore('torrent', () => {
   const torrents = ref<Torrent[]>([])
   const settingStore = useSettingStore()
@@ -65,13 +126,14 @@ export const useTorrentStore = defineStore('torrent', () => {
     const filtered: Torrent[] = []
     //  生成索引映射
     const mapFilterTorrentsIndex: Record<number, number> = {}
+    const mapTorrentsIndex: Record<number, number> = {}
 
     // 一次循环完成所有计算：统计 + 过滤
     let filteredIndex = 0
-    torrents.value.forEach((t) => {
+    torrents.value.forEach((t, idx) => {
+      mapTorrentsIndex[t.id] = idx
       // 将选项全部放到 map 中
       detailFilterOptions(t, labelsSet, trackerSet, errorStringSet, downloadDirSet, statusSet)
-
       // 如果通过所有过滤条件，加入结果数组
       if (
         isFilterTorrents(t, search, statusFilter, labelsFilter, trackerFilter, errorStringFilter, downloadDirFilter)
@@ -112,7 +174,8 @@ export const useTorrentStore = defineStore('torrent', () => {
     return {
       options,
       filterTorrents: filtered,
-      mapFilterTorrentsIndex
+      mapFilterTorrentsIndex,
+      mapTorrentsIndex: mapTorrentsIndex
     }
   })
 
@@ -134,59 +197,43 @@ export const useTorrentStore = defineStore('torrent', () => {
   } = useSelection(() => filterTorrents.value)
 
   async function fetchTorrents() {
-    const fields = [
-      'activityDate',
-      'addedDate',
-      'bandwidthPriority',
-      'doneDate',
-      'downloadDir',
-      'downloadedEver',
-      'error',
-      'errorString',
-      'eta',
-      'file-count',
-      'group',
-      'haveValid',
-      'id',
-      'isPrivate',
-      'labels',
-      'leftUntilDone',
-      'magnetLink',
-      'metadataPercentComplete',
-      'name',
-      'peersGettingFromUs',
-      'peersSendingToUs',
-      'percentDone',
-      'pieceCount',
-      'queuePosition',
-      'rateDownload',
-      'rateUpload',
-      'secondsSeeding',
-      'sizeWhenDone',
-      'status',
-      'totalSize',
-      'trackerStats',
-      'uploadRatio',
-      'uploadedEver',
-      'trackerList',
-      'seedIdleLimit',
-      'seedIdleMode',
-      'seedRatioLimit',
-      'seedRatioMode',
-      'sequential_download',
-      'honorsSessionLimits',
-      'downloadLimited',
-      'uploadLimited',
-      'downloadLimit',
-      'uploadLimit',
-      'peer-limit'
-    ]
+    const fields = listFields
     const res = await rpc.torrentGet(fields)
-    torrents.value = (res?.arguments?.torrents || []).map(processTorrent)
+    const old = torrents.value
+    let newRes = res?.arguments?.torrents || []
+    newRes = newRes.map((t) => {
+      const item = processTorrent(t)
+      const index = computedData.value.mapTorrentsIndex[item.id]
+      if (index >= 0) {
+        Object.assign(item, old[index])
+      }
+      return item
+    })
+    torrents.value = newRes
+  }
+
+  async function fetchDetails() {
+    if (selectedKeys.value.length === 0) {
+      return
+    }
+    const id = selectedKeys.value[0]
+    const res = await rpc.torrentGet([...detailFields, ...listFields], [id], {
+      params: {
+        type: 'detail'
+      }
+    })
+    const index = computedData.value.mapTorrentsIndex[id]
+    if (index >= 0 && res?.arguments?.torrents?.[0]) {
+      Object.assign(torrents.value[index], res?.arguments?.torrents?.[0])
+    }
   }
 
   const interval = computed(() => settingStore.setting.polling.torrentInterval * 1000)
   const { pause: stopPolling, resume: startPolling } = useIntervalFn(fetchTorrents, interval, { immediate: false })
+  const detailInterval = computed(() => settingStore.setting.polling.torrentDetailInterval * 1000)
+  const { pause: stopDetailPolling, resume: startDetailPolling } = useIntervalFn(fetchDetails, detailInterval, {
+    immediate: false
+  })
 
   watch([search, statusFilter, labelsFilter, trackerFilter, errorStringFilter, downloadDirFilter], () => {
     clearSelectedKeys()
@@ -228,6 +275,9 @@ export const useTorrentStore = defineStore('torrent', () => {
     sortKey,
     sortOrder,
     setSort,
-    mapColumnWidth
+    mapColumnWidth,
+    fetchDetails,
+    startDetailPolling,
+    stopDetailPolling
   }
 })

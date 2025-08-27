@@ -85,7 +85,7 @@ export const useTableStore = defineStore('CanvasTable', () => {
       }
     }
 
-    return Math.min(left, heights.length - 1)
+    return Math.min(left + 1, heights.length - 1)
   }
 
   // 获取行的 Y 位置

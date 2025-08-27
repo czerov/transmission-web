@@ -3,14 +3,13 @@
     class="canvas-body-wrapper"
     :style="{ height: canvasHeight + 'px', width: containerWidth + 'px', top: HEADER_HEIGHT + 'px' }"
   >
-    <canvas class="canvas-select" v-if="isSmallLg" ref="bodyCanvasSelect"></canvas>
+    <canvas class="canvas-select" v-if="isSupportTouch" ref="bodyCanvasSelect"></canvas>
     <canvas class="canvas-body" ref="bodyCanvas"></canvas>
   </div>
   <RowMenu v-model:show="showDropdown" :x="rowMenuX" :y="rowMenuY" to="body" />
 </template>
 <script setup lang="ts">
 import type { Torrent } from '@/api/rpc'
-import { useIsSmallLg } from '@/composables/useIsSmallScreen'
 import { useSettingStore, useTorrentStore } from '@/store'
 import { isMac } from '@/utils/index'
 import type { AnyTouchEvent } from 'any-touch'
@@ -36,6 +35,7 @@ import { useTableStore } from './store/tableStore'
 import checkboxCheckedIconUrl from '@/assets/icons/checkboxchecked.svg?raw'
 import checkboxUncheckedIconUrl from '@/assets/icons/checkboxunchecked.svg?raw'
 import { ITEM_HEIGHT, HEADER_HEIGHT } from './store/utils'
+import { isSupportTouch } from '@/utils/evt'
 
 defineExpose({
   onMouseMove,
@@ -56,9 +56,9 @@ const canvasHeight = computed(() => tableStore.clientHeight || 0)
 const rowMenuX = ref(0)
 const rowMenuY = ref(0)
 const showDropdown = ref(false)
-const isSmallLg = useIsSmallLg()
+
 const containerWidth = computed(() => {
-  return isSmallLg.value ? canvasWidth.value + checkboxWidth : canvasWidth.value
+  return isSupportTouch ? canvasWidth.value + checkboxWidth : canvasWidth.value
 })
 
 // 开始渲染的偏移
@@ -419,14 +419,14 @@ function scheduleDraw(isResize: boolean = false) {
     if (isResize) {
       updateSize()
     }
-    const d = performance.now()
+    // const d = performance.now()
     drawBody()
-    console.debug(
-      'drawBody',
-      performance.now() - d + 'ms',
-      'draw Rows: ',
-      tableStore.visibleEnd - tableStore.visibleStart
-    )
+    // console.debug(
+    //   'drawBody',
+    //   performance.now() - d + 'ms',
+    //   'draw Rows: ',
+    //   tableStore.visibleEnd - tableStore.visibleStart
+    // )
     rafId = null
   })
 }

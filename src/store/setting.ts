@@ -50,6 +50,15 @@ export const useSettingStore = defineStore('setting', () => {
     localStorage,
     { mergeDefaults: true, deep: true, writeDefaults: true }
   )
+  // 侧边栏宽度
+  const sidebarWidth = useStorage('sidebarWidth', 224, undefined)
+
+  // 详情高度-pc 端生效
+  const detailHeight = useStorage('detailHeight', 280)
+
+  const headerHeight = ref(56)
+  const footerHeight = ref(32)
+
   const authSession = useStorage('auth', '', sessionStorage, { mergeDefaults: true, deep: true, writeDefaults: true })
 
   function setDomain(val: string) {
@@ -141,6 +150,10 @@ export const useSettingStore = defineStore('setting', () => {
     setDomain,
     setAuth,
     setSavePassword,
-    setPolling
+    setPolling,
+    sidebarWidth,
+    detailHeight,
+    headerHeight,
+    footerHeight
   }
 })

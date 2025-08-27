@@ -9,7 +9,7 @@ export const Status = {
   seeding: 6
 } as const
 
-export const StatusStrings = ['停止', '等待验证', '验证中', '等待下载', '下载中', '等待做种', '做种中'] as const
+export const StatusStrings = ['已暂停', '等待验证', '验证中', '等待下载', '下载中', '等待做种', '做种中'] as const
 
 const PriorityNumbers = [-1, 0, 1] as const
 

@@ -1,4 +1,4 @@
-import type { AxiosInstance } from 'axios'
+import type { AxiosInstance, AxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import router from '../router'
 
@@ -35,6 +35,9 @@ export const setAuth = (authString: string) => {
 }
 
 const getBaseURL = () => {
+  if (domain.endsWith('/')) {
+    domain = domain.slice(0, -1)
+  }
   if (!domain.endsWith('transmission/rpc')) {
     return `${domain}/transmission/rpc`
   }
@@ -293,6 +296,12 @@ export interface Torrent extends TorrentOther {
   uploadedEver: number
   /** 添加时间（Unix 时间戳，秒） */
   addedDate: number
+  /** 完成时间（Unix 时间戳，秒） */
+  doneDate?: number
+  /** 最后活动时间（Unix 时间戳，秒） */
+  activityDate?: number
+  /** 预计剩余时间（秒） */
+  eta?: number
   /** 带宽优先级 */
   bandwidthPriority: number
   /** 下载目录 */
@@ -315,6 +324,8 @@ export interface Torrent extends TorrentOther {
   name: string
   /** 是否顺序下载 */
   sequentialDownload: boolean
+  /** 是否私有种子 */
+  isPrivate?: boolean
   /** 正在从本客户端下载的 peer 数 */
   peersGettingFromUs: number
   /** 正在向本客户端上传的 peer 数 */
@@ -323,6 +334,8 @@ export interface Torrent extends TorrentOther {
   percentDone: number
   /** 分片数量 */
   pieceCount: number
+  /** 每个分片大小（字节） */
+  pieceSize?: number
   /** 当前下载速度（字节/秒） */
   rateDownload: number
   /** 当前上传速度（字节/秒） */
@@ -333,6 +346,8 @@ export interface Torrent extends TorrentOther {
   sizeWhenDone: number
   /** 状态码 */
   status: number
+  /** 队列位置 */
+  queuePosition?: number
   /** 总大小（字节） */
   totalSize: number
   /** Tracker 信息数组 */
@@ -342,6 +357,14 @@ export interface Torrent extends TorrentOther {
   trackerList: string
   /** 分享率 */
   uploadRatio: number
+  /** SHA1 或 BTIH 哈希 */
+  hashString?: string
+  /** 重新校验进度 0-1 */
+  recheckProgress?: number
+  /** Peers 列表（详情） */
+  peers?: Peer[]
+  /** Peers 来源统计（详情） */
+  peersFrom?: PeersFrom
   /** 如果为 true，则遵守会话上传限制 */
   honorsSessionLimits?: boolean
   /** 种子级别的做种不活动时间限制（分钟数） */
@@ -368,6 +391,54 @@ export interface Torrent extends TorrentOther {
   uploadLimit?: number
   /** 最大连接数 */
   'peer-limit'?: number
+  /** 文件列表 */
+  files?: TorrentFile[]
+  /** 创建时间 */
+  dateCreated?: number
+  /** 创建者 */
+  creator?: string
+  /** 注释 */
+  comment?: string
+  /** 损坏的块数 */
+  corruptEver?: number
+  /** 备用带宽组 */
+  group?: string
+  /** 最大连接数 */
+  maxConnectedPeers?: number
+}
+
+export interface TorrentFile {
+  bytesCompleted: number
+  length: number
+  begin_piece: number
+  end_piece: number
+  name: string
+}
+
+export interface Peer {
+  address: string
+  clientName: string
+  clientIsChoked?: boolean
+  clientIsInterested?: boolean
+  flagStr?: string
+  isDownloadingFrom?: boolean
+  isUploadingTo?: boolean
+  peerIsChoked?: boolean
+  peerIsInterested?: boolean
+  port?: number
+  progress?: number
+  rateToClient?: number
+  rateToPeer?: number
+}
+
+export interface PeersFrom {
+  fromCache?: number
+  fromDht?: number
+  fromIncoming?: number
+  fromLpd?: number
+  fromLtep?: number
+  fromPex?: number
+  fromTracker?: number
 }
 
 /**
@@ -532,12 +603,13 @@ export interface TorrentSetArgs {
 }
 
 // ================== 通用 RPC 调用 ==================
-export async function callRpc<T = any>(method: string, args: object = {}): Promise<T | undefined> {
+export async function callRpc<T = any>(
+  method: string,
+  args: object = {},
+  config: AxiosRequestConfig = {}
+): Promise<T | undefined> {
   try {
-    const res = await instance.post('', {
-      method,
-      arguments: args
-    })
+    const res = await instance.post('', { method, arguments: args }, config)
     return res.data
   } catch (error) {
     console.error(error)
@@ -565,12 +637,9 @@ export const rpc = {
       'errorString',
       'tags'
     ],
-    ids?: number[] | number
-  ) =>
-    callRpc<TorrentGetResponse>('torrent-get', {
-      fields,
-      ...(ids ? { ids } : {})
-    }),
+    ids?: number[] | number,
+    config?: AxiosRequestConfig
+  ) => callRpc<TorrentGetResponse>('torrent-get', { fields, ...(ids ? { ids } : {}) }, config),
   torrentAdd: (args: TorrentAddArgs) => callRpc<TorrentAddResponse>('torrent-add', args),
   torrentRemove: async (ids: number[] | number, deleteData = false) => {
     const res = await callRpc('torrent-remove', { ids, 'delete-local-data': deleteData })
