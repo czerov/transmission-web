@@ -65,6 +65,29 @@ Transmission Web 是一个现代化的 Transmission BitTorrent 客户端 Web 界
 - **虚拟滚动**: Vue Virtual Scroller
 - **工具库**: VueUse, Day.js, Lodash
 
+
+## 🐳 Docker 部署
+
+项目提供了 Docker 支持，可以快速部署到任何支持 Docker 的环境。
+
+### 构建镜像
+
+```bash
+docker build -t transmission-web .
+```
+
+### 运行容器
+
+```bash
+docker run -d -p 7632:7632 jianxcao/transmission-web
+```
+
+
+## 直接给 transmission 运行
+-  下载 [release](https://github.com/jianxcao/transmission-web/releases) 页面下的压缩包 **transmission-web-*.zip**
+-  解压内容到服务器的目录（tr 容器需可以访问该目录）
+-  配置 env TRANSMISSION_WEB_HOME为解压的目录
+
 ## 📦 安装与运行
 
 ### 环境要求
@@ -106,21 +129,6 @@ pnpm dev
 pnpm build
 ```
 
-## 🐳 Docker 部署
-
-项目提供了 Docker 支持，可以快速部署到任何支持 Docker 的环境。
-
-### 构建镜像
-
-```bash
-docker build -t transmission-web .
-```
-
-### 运行容器
-
-```bash
-docker run -d -p 7632:7632 jianxcao/transmission-web
-```
 
 ## 📁 项目结构
 
