@@ -82,8 +82,10 @@ jobs:
 
           echo "Creating release for version: $VERSION"
 
-          # 创建压缩包
-          zip -r "transmission-web-${VERSION}.zip" dist/
+          # 创建压缩包（不包含 dist 目录）
+          cd dist
+          zip -r "../transmission-web-${VERSION}.zip" .
+          cd ..
 
           # 验证压缩包
           if [ ! -f "transmission-web-${VERSION}.zip" ]; then
