@@ -37,7 +37,10 @@
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext .ts,.vue --fix",
-    "lint:fix": "eslint . --ext .ts,.vue --fix"
+    "lint:fix": "eslint . --ext .ts,.vue --fix",
+    "release": "bash scripts/release-github.sh",
+    "release:check": "bash scripts/check-env.sh",
+    "build:prod": "bash scripts/build.sh"
   },
   "dependencies": {
     "@any-touch/vue3": "^2.2.0",
@@ -91,6 +94,10 @@
     "vite": "^7.0.0",
     "vite-svg-loader": "^5.1.0",
     "vue-tsc": "^2.2.10"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.0.0"
   },
   "pnpm": {
     "overrides": {
