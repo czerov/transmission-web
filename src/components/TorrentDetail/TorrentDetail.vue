@@ -19,6 +19,9 @@
       <n-tab-pane name="general" tab="常规" class="tab-pane">
         <GeneralTab v-if="torrent" :torrent="torrent" />
       </n-tab-pane>
+      <n-tab-pane name="files" tab="内容" class="tab-pane">
+        <FilesTab v-if="torrent" :torrent="torrent" />
+      </n-tab-pane>
       <n-tab-pane name="peers" tab="用户" class="tab-pane">
         <PeersTab v-if="torrent" :torrent="torrent" />
       </n-tab-pane>
@@ -63,7 +66,7 @@ const torrent = computed<Torrent | undefined>(() => {
   return torrentStore.filterTorrents.find((t) => t.id === id)
 })
 
-const currentTab = ref<'general' | 'peers' | 'tracker'>('general')
+const currentTab = ref<'general' | 'files' | 'peers' | 'tracker'>('general')
 
 const rootStyle = computed(() => {
   return props.height ? { height: `${props.height}px` } : {}
@@ -94,6 +97,11 @@ function onClose() {
   :deep(.n-tabs-nav) {
     padding-inline: 12px;
   }
+
+  :deep(.n-tabs-pane-wrapper) {
+    height: 100%;
+  }
+
   :deep(.tab-pane) {
     .scrollbar();
     overflow: auto;

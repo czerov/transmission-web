@@ -393,6 +393,8 @@ export interface Torrent extends TorrentOther {
   'peer-limit'?: number
   /** 文件列表 */
   files?: TorrentFile[]
+  /** 文件状态列表 */
+  fileStats?: TorrentFileStats[]
   /** 创建时间 */
   dateCreated?: number
   /** 创建者 */
@@ -413,6 +415,12 @@ export interface TorrentFile {
   begin_piece: number
   end_piece: number
   name: string
+}
+
+export interface TorrentFileStats {
+  bytesCompleted: number
+  wanted: boolean
+  priority: number
 }
 
 export interface Peer {

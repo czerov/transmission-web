@@ -67,6 +67,7 @@ const detailFields = [
   'hashString',
   'recheckProgress',
   'files',
+  'fileStats',
   'peers',
   'peersFrom',
   'creator',
