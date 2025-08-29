@@ -83,10 +83,17 @@ docker run -d -p 7632:7632 jianxcao/transmission-web
 ```
 
 
-## 直接给 transmission 运行
+## 配置transmission docker 运行
 -  下载 [release](https://github.com/jianxcao/transmission-web/releases) 页面下的压缩包 **transmission-web-*.zip**
 -  解压内容到服务器的目录（tr 容器需可以访问该目录）
 -  配置 env TRANSMISSION_WEB_HOME为解压的目录
+
+
+## 界面预览
+![面板](./docs/imgs/dashborad.png)
+![移动端面板](./docs/imgs/mobileDashborad.png)
+![移动端菜单](./docs/imgs/mobileSiderbar.png)
+![添加种子](./docs/imgs/add.png)
 
 ## 📦 安装与运行
 
