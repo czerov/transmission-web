@@ -7,7 +7,7 @@
       <div>Transmission Web 前端</div>
       <div>版本: {{ session?.['version'] ?? '--' }}</div>
       <div>服务器: {{ serverHost }}</div>
-      <div class="mt-2">作者: jianxcao@126.com</div>
+      <a class="mt-2" href="https://github.com/jianxcao/transmission-web">作者: jianxcao@126.com</a>
     </div>
     <template #action>
       <n-button type="primary" @click="onUpdateShow(false)">关闭</n-button>
