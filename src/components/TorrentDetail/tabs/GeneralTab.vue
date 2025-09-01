@@ -162,7 +162,7 @@ function formatDate(ts?: number) {
     return '-'
   }
   try {
-    return dayjs(ts * 1000).format('YYYY/MM/DD HH:mm:ss')
+    return dayjs(ts * 1000).format('YYYY-MM-DD HH:mm:ss')
   } catch {
     return '-'
   }

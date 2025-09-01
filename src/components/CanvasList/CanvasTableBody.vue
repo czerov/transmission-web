@@ -314,11 +314,14 @@ function getRowIndex(e: MouseEvent | AnyTouchEvent) {
       return i
     }
   }
-  return heights.length - 1
+  return null
 }
 
 function onMouseMove(e: MouseEvent) {
   const rowIndex = getRowIndex(e)
+  if (rowIndex === null) {
+    return
+  }
   if (tableStore.visibleStart <= rowIndex && rowIndex <= tableStore.visibleEnd) {
     const row = filteredTorrents.value[rowIndex]
     if (row) {
@@ -336,6 +339,9 @@ function onMouseLeave() {
 function onRowClick(e: MouseEvent) {
   const rowIndex = getRowIndex(e)
 
+  if (rowIndex === null) {
+    return
+  }
   if (tableStore.visibleStart <= rowIndex && rowIndex <= tableStore.visibleEnd) {
     const row = filteredTorrents.value[rowIndex]
     if (!row) {
@@ -366,6 +372,9 @@ function onRowClick(e: MouseEvent) {
 function onRowContextMenu(e: MouseEvent) {
   e.preventDefault()
   const rowIndex = getRowIndex(e)
+  if (rowIndex === null) {
+    return
+  }
   if (tableStore.visibleStart <= rowIndex && rowIndex <= tableStore.visibleEnd) {
     const row = filteredTorrents.value[rowIndex]
     if (row && !mapSelectedKeys.value[row.id]) {
@@ -382,6 +391,9 @@ function onRowContextMenu(e: MouseEvent) {
 
 function handleLongtap(e: AnyTouchEvent) {
   const rowIndex = getRowIndex(e)
+  if (rowIndex === null) {
+    return
+  }
   if (tableStore.visibleStart <= rowIndex && rowIndex <= tableStore.visibleEnd) {
     const row = filteredTorrents.value[rowIndex]
     if (row) {
@@ -393,7 +405,6 @@ function handleLongtap(e: AnyTouchEvent) {
 }
 
 function onKeyDown(event: KeyboardEvent) {
-  console.log('onKeyDown', event)
   event.preventDefault()
   const isCmdOrCtrl = isMac() ? event.metaKey : event.ctrlKey
   const isKeyA = event.key.toLowerCase() === 'a' // 忽略大小写
@@ -430,8 +441,6 @@ function scheduleDraw(isResize: boolean = false) {
     rafId = null
   })
 }
-
-;(window as any).scheduleDraw = scheduleDraw
 
 // 合并渲染触发器，避免多个独立的 watch
 const renderTriggers = computed(() => ({

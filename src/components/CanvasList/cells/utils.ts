@@ -23,6 +23,7 @@ export function fitText(
   maxHeight: number,
   multiline: boolean = false
 ): string | string[] {
+  // console.debug('fitText', text, maxWidth, maxHeight, multiline)
   // 如果不启用多行模式，保持原有的单行逻辑
   if (!multiline) {
     if (getTextWidth(ctx, text) <= maxWidth) {
@@ -49,7 +50,6 @@ export function fitText(
   const settingStore = useSettingStore()
   const lineHeight = settingStore.lineHeight
   const maxLines = Math.floor(maxHeight / lineHeight)
-
   if (maxLines <= 0) {
     return []
   }
@@ -74,8 +74,8 @@ export function fitText(
   for (let i = 0; i < text.length; i++) {
     const char = text[i]
     const testLine = currentLine + char
-
-    if (getTextWidth(ctx, testLine) <= maxWidth) {
+    const w = getTextWidth(ctx, testLine)
+    if (w <= maxWidth) {
       currentLine = testLine
     } else {
       // 当前行已满，换行
@@ -99,16 +99,17 @@ export function fitText(
   if (currentLine && lines.length < maxLines) {
     lines.push(currentLine)
   }
-
   // 如果文字被截断（行数达到限制但还有剩余文字），在最后一行添加省略号
   if (lines.length === maxLines && (currentLine || lines.length * maxWidth < getTextWidth(ctx, text))) {
     const lastLineIndex = lines.length - 1
     const lastLine = lines[lastLineIndex]
     const ellipsis = '...'
 
-    // 检查最后一行加上省略号是否超宽
     const lastLineWithEllipsis = lastLine + ellipsis
-    if (getTextWidth(ctx, lastLineWithEllipsis) <= maxWidth) {
+    if (getTextWidth(ctx, lastLine) <= maxWidth) {
+      lines[lastLineIndex] = lastLine
+    } else if (getTextWidth(ctx, lastLineWithEllipsis) <= maxWidth) {
+      // 检查最后一行加上省略号是否超宽
       lines[lastLineIndex] = lastLineWithEllipsis
     } else {
       // 需要截断最后一行来腾出省略号的空间
@@ -129,7 +130,6 @@ export function fitText(
       lines[lastLineIndex] = result
     }
   }
-
   return lines
 }
 
@@ -211,8 +211,7 @@ export function drawText(
   fillText(ctx, text, x, y + height / 2, align, baseline)
 }
 
-// 绘制多行文本
-
+// 绘制多行文本指定行数，超出就...
 export function drawMultilineText(
   ctx: CanvasRenderingContext2D,
   lines: string[],
@@ -278,4 +277,45 @@ export function drawIcon(ctx: CanvasRenderingContext2D, icon: HTMLImageElement, 
     },
     { once: true }
   )
+}
+
+// ========== 移动端专用工具函数 ==========
+
+// 绘制进度条
+export function drawProgressBar(
+  ctx: CanvasRenderingContext2D,
+  progress: number,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  theme: any
+) {
+  // 背景
+  ctx.fillStyle = theme.borderColor
+  ctx.fillRect(x, y, width, height)
+
+  // 进度
+  if (progress > 0) {
+    ctx.fillStyle = theme.primaryColor
+    ctx.fillRect(x, y, width * progress, height)
+  }
+
+  // 进度百分比文字
+  ctx.fillStyle = theme.textColorBase
+  ctx.font = `${parseInt(theme.fontSize) - 2}px ${theme.fontFamily}`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  const progressText = `${(progress * 100).toFixed(1)}%`
+  ctx.fillText(progressText, x + width / 2, y + height / 2)
+  ctx.textAlign = 'start'
+  ctx.textBaseline = 'top'
+}
+
+// 设置文本样式
+export function setTextStyle(ctx: CanvasRenderingContext2D, theme: any, fontSize: number = 0, color?: string) {
+  const actualFontSize = fontSize || parseInt(theme.fontSize)
+  ctx.font = `${actualFontSize}px ${theme.fontFamily}`
+  ctx.fillStyle = color || theme.textColorBase
+  ctx.textBaseline = 'top'
 }

@@ -92,6 +92,10 @@ export const useSettingStore = defineStore('setting', () => {
     return Math.round(parseInt(themeVars.value.fontSize) * parseFloat(themeVars.value.lineHeight)) || 22
   })
 
+  const lineHeightMini = computed(() => {
+    return Number(Math.round(parseInt(themeVars.value.fontSizeMini) * 1.2).toFixed(0))
+  })
+
   function setTheme(val: string) {
     setting.value.theme = val
   }
@@ -146,6 +150,7 @@ export const useSettingStore = defineStore('setting', () => {
     setThemeVars,
     safeArea,
     lineHeight,
+    lineHeightMini,
     serverHost,
     setDomain,
     setAuth,

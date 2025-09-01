@@ -10,7 +10,7 @@ interface Column {
 }
 const props = defineProps<{ value: number; row: Torrent; col: Column }>()
 const date = computed(() => {
-  const d = dayjs(props.value * 1000).format('YYYY/MM/DD HH:mm:ss')
+  const d = dayjs(props.value * 1000).format('YYYY-MM-DD HH:mm:ss')
   if (d === 'Invalid Date' || props.value === 0) {
     return ''
   }

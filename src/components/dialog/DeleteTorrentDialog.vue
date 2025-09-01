@@ -33,6 +33,9 @@ const torrentStore = useTorrentStore()
 const loading = ref(false)
 const deleteData = ref(false)
 const onlyIfNoSeed = ref(false)
+const props = defineProps<{
+  ids?: number[]
+}>()
 // 本地快照
 const localSelectedKeys = ref<number[]>([])
 watch(
@@ -44,7 +47,7 @@ watch(
     }
     if (v) {
       // 弹窗打开时快照
-      localSelectedKeys.value = [...torrentStore.selectedKeys]
+      localSelectedKeys.value = props.ids?.length ? props.ids : torrentStore.selectedKeys
     } else {
       // 弹窗关闭时清空
       localSelectedKeys.value = []
@@ -103,7 +106,9 @@ async function onConfirm() {
       message.error('删除失败')
       return
     }
-    torrentStore.clearSelectedKeys()
+    if (!props.ids?.length) {
+      torrentStore.clearSelectedKeys()
+    }
     show.value = false
     message.success('删除成功')
     await sleep(1000)

@@ -21,6 +21,8 @@
 
     <!-- Main Content -->
     <main :class="$style.content">
+      <!-- <CanvasMobileList v-if="isMobile" :list-height="listheight" />
+      <CanvasList v-else :list-height="listheight" /> -->
       <CanvasList :list-height="listheight" />
       <div v-if="!isMobile" :class="$style['detail-container']" ref="detailContainerRef">
         <template v-if="pcDetailVisible">
@@ -71,6 +73,7 @@ import LayoutSidebarLeftOpen from '@/assets/icons/layoutSidebarLeft.svg?componen
 import { useIsSmallScreen } from '@/composables/useIsSmallScreen'
 import { useSettingStore, useStatsStore, useTorrentStore } from '@/store'
 import { useSessionStore } from '@/store/session'
+
 const torrentStore = useTorrentStore()
 const statsStore = useStatsStore()
 const sessionStore = useSessionStore()

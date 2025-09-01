@@ -13,11 +13,11 @@
     :style="{ maxHeight: maxHeight }"
     scrollable
   />
-  <DeleteTorrentDialog v-model:show="showDeleteDialog" />
-  <ChangeDirDialog v-model:show="showChangeDirDialog" />
-  <ChangeLables v-model:show="showChangeLabelDialog" />
-  <ChangeTracker v-model:show="showChangeTrackerDialog" />
-  <OtherTorrentSetting v-model:show="showChangeOtherDialog" />
+  <DeleteTorrentDialog v-model:show="showDeleteDialog" :ids="id ? [id] : undefined" />
+  <ChangeDirDialog v-model:show="showChangeDirDialog" :ids="id ? [id] : undefined" />
+  <ChangeLables v-model:show="showChangeLabelDialog" :ids="id ? [id] : undefined" />
+  <ChangeTracker v-model:show="showChangeTrackerDialog" :ids="id ? [id] : undefined" />
+  <OtherTorrentSetting v-model:show="showChangeOtherDialog" :ids="id ? [id] : undefined" />
 </template>
 
 <script setup lang="ts">
@@ -60,6 +60,7 @@ const props = defineProps<{
   x: number
   y: number
   to: string
+  id?: number
 }>()
 const show = defineModel<boolean>('show')
 const maxHeight = ref('auto')
@@ -151,7 +152,10 @@ watch(
   }
 )
 const closeDropdown = (e: any) => {
-  if (e.target instanceof HTMLElement && e.target.closest('.row-drop-down-menus')) {
+  if (
+    e.target instanceof HTMLElement &&
+    (e.target.closest('.row-drop-down-menus') || e.target.closest('.canvas-mobile-list-scroll-holder'))
+  ) {
     return
   }
   show.value = false
@@ -163,7 +167,7 @@ onUnmounted(() => {
   at.off('tap', closeDropdown)
 })
 async function onDropdownSelect(key: string) {
-  const ids = torrentStore.selectedKeys
+  const ids = props.id ? [props.id] : torrentStore.selectedKeys
   if (!ids || ids.length === 0) {
     message.warning('请先选择任务')
     return
@@ -197,9 +201,7 @@ async function onDropdownSelect(key: string) {
       showDeleteDialog.value = true
       break
     case 'copyName':
-      const names = torrentStore.selectedKeys
-        .map((id) => torrentStore.torrents.find((t) => t.id === id)?.name)
-        .join('\n')
+      const names = ids.map((id) => torrentStore.torrents.find((t) => t.id === id)?.name).join('\n')
       const nameSuccess = await copyToClipboard(names)
       if (nameSuccess) {
         message.success('已复制名称')
@@ -208,7 +210,7 @@ async function onDropdownSelect(key: string) {
       }
       break
     case 'copyPath':
-      const paths = torrentStore.selectedKeys
+      const paths = ids
         .map((id) => {
           const t = torrentStore.torrents.find((t) => t.id === id)
           return t ? `${ensurePathDelimiter(t.downloadDir, t.name)}` : ''
@@ -222,9 +224,7 @@ async function onDropdownSelect(key: string) {
       }
       break
     case 'copyMagnet':
-      const magnets = torrentStore.selectedKeys
-        .map((id) => torrentStore.torrents.find((t) => t.id === id)?.magnetLink)
-        .join('\n')
+      const magnets = ids.map((id) => torrentStore.torrents.find((t) => t.id === id)?.magnetLink).join('\n')
       const magnetSuccess = await copyToClipboard(magnets)
       if (magnetSuccess) {
         message.success('已复制磁力链接')

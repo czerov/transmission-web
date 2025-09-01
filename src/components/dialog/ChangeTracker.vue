@@ -52,7 +52,7 @@ watch(
   (v) => {
     if (v) {
       // 默认目录为 sessionStore.session?.['download-dir'] 或第一个选中种子的 downloadDir
-      localSelectedKeys.value = [...(props.ids ? props.ids : torrentStore.selectedKeys)]
+      localSelectedKeys.value = [...(props.ids?.length ? props.ids : torrentStore.selectedKeys)]
       const firstTorrent = torrentStore.torrents.find((t) => localSelectedKeys.value.includes(t.id))
       tracker.value = firstTorrent?.trackerList || firstTorrent?.trackerStats.map((t) => t.announce).join('\n') || ''
       console.debug(localSelectedKeys.value)

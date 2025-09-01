@@ -40,6 +40,9 @@ const sessionStore = useSessionStore()
 const loading = ref(false)
 const moveData = ref(true)
 const dir = ref('')
+const props = defineProps<{
+  ids?: number[]
+}>()
 const localSelectedKeys = ref<number[]>([])
 
 const downloadDirOptions = computed(() =>
@@ -56,9 +59,9 @@ watch(
     if (v) {
       moveData.value = true
       // 默认目录为 sessionStore.session?.['download-dir'] 或第一个选中种子的 downloadDir
-      const firstTorrent = torrentStore.torrents.find((t) => torrentStore.selectedKeys.includes(t.id))
+      localSelectedKeys.value = props.ids?.length ? props.ids : torrentStore.selectedKeys
+      const firstTorrent = torrentStore.torrents.find((t) => localSelectedKeys.value.includes(t.id))
       dir.value = firstTorrent?.downloadDir || sessionStore.session?.['download-dir'] || ''
-      localSelectedKeys.value = [...torrentStore.selectedKeys]
     } else {
       localSelectedKeys.value = []
     }

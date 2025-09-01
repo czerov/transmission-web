@@ -39,7 +39,9 @@ const torrentStore = useTorrentStore()
 const loading = ref(false)
 const labels = ref<string[]>([])
 const localSelectedKeys = ref<number[]>([])
-
+const props = defineProps<{
+  ids?: number[]
+}>()
 const labelsOptions = computed(() =>
   torrentStore.labelsOptions
     .filter((item: any) => item.key !== 'all' && item.key !== 'noLabels')
@@ -53,9 +55,9 @@ watch(
   (v) => {
     if (v) {
       // 默认目录为 sessionStore.session?.['download-dir'] 或第一个选中种子的 downloadDir
-      const firstTorrent = torrentStore.torrents.find((t) => torrentStore.selectedKeys.includes(t.id))
+      localSelectedKeys.value = props.ids?.length ? props.ids : torrentStore.selectedKeys
+      const firstTorrent = torrentStore.torrents.find((t) => localSelectedKeys.value.includes(t.id))
       labels.value = firstTorrent?.labels || []
-      localSelectedKeys.value = [...torrentStore.selectedKeys]
     } else {
       localSelectedKeys.value = []
     }

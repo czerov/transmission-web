@@ -203,10 +203,10 @@ export const useTorrentStore = defineStore('torrent', () => {
     const old = torrents.value
     let newRes = res?.arguments?.torrents || []
     newRes = newRes.map((t) => {
-      const item = processTorrent(t)
+      let item = processTorrent(t)
       const index = computedData.value.mapTorrentsIndex[item.id]
       if (index >= 0) {
-        Object.assign(item, old[index])
+        item = Object.assign({}, old[index], item)
       }
       return item
     })

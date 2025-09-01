@@ -78,7 +78,9 @@ const message = useMessage()
 const torrentStore = useTorrentStore()
 const sessionStore = useSessionStore()
 const loading = ref(false)
-
+const props = defineProps<{
+  ids?: number[]
+}>()
 const formData = reactive({
   // 使用全局上传限制
   honorsSessionLimits: false,
@@ -112,7 +114,9 @@ const modeOptions = [
 
 watch(show, (v) => {
   if (v) {
-    const firstTorrent = torrentStore.torrents.find((t) => torrentStore.selectedKeys.includes(t.id))
+    const firstTorrent = torrentStore.torrents.find((t) =>
+      props.ids ? props.ids.includes(t.id) : torrentStore.selectedKeys.includes(t.id)
+    )
     formData.honorsSessionLimits = firstTorrent?.honorsSessionLimits || false
     formData.seedIdleLimit = firstTorrent?.seedIdleLimit || 30
     formData.seedIdleMode = firstTorrent?.seedIdleMode || 0
@@ -129,8 +133,9 @@ watch(show, (v) => {
 
 async function onConfirm() {
   loading.value = true
+  const ids = props.ids?.length ? props.ids : torrentStore.selectedKeys
   try {
-    await rpc.torrentSet({ ids: torrentStore.selectedKeys, ...formData })
+    await rpc.torrentSet({ ids, ...formData })
     show.value = false
     message.success('修改成功')
     await torrentStore.fetchTorrents()

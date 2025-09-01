@@ -11,7 +11,7 @@ export default function render(
 ) {
   ctx.save()
   const value = Number(row[col.key as keyof Torrent])
-  let d = dayjs(value * 1000).format('YYYY/MM/DD HH:mm:ss')
+  let d = dayjs(value * 1000).format('YYYY-MM-DD HH:mm:ss')
   if (d === 'Invalid Date' || value === 0) {
     d = ''
   }
