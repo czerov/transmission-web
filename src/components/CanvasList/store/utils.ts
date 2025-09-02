@@ -3,6 +3,7 @@ import type { CustomThemeCommonVars, ThemeCommonVars } from 'naive-ui'
 
 export const ITEM_HEIGHT = 32
 export const HEADER_HEIGHT = 32
+export const TOOLBAR_HEIGHT = 32
 export const PADDING_X = 12
 export const ICON_SIZE = 18
 export const ICON_GAP = 4

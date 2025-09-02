@@ -21,9 +21,8 @@
 
     <!-- Main Content -->
     <main :class="$style.content">
-      <!-- <CanvasMobileList v-if="isMobile" :list-height="listheight" />
-      <CanvasList v-else :list-height="listheight" /> -->
-      <CanvasList :list-height="listheight" />
+      <CanvasList v-if="!isMobile || toolbarStore.listType === 'table'" :list-height="listheight" />
+      <CanvasMobileList v-else :list-height="listheight" />
       <div v-if="!isMobile" :class="$style['detail-container']" ref="detailContainerRef">
         <template v-if="pcDetailVisible">
           <ResizeHorizontalLine
@@ -60,6 +59,7 @@
       placement="right"
       width="92vw"
       to="body"
+      :class="$style['drawer-sidebar']"
       :mask-closable="true"
     >
       <n-drawer-content :body-content-class="$style['drawer-mobile-detail']">
@@ -73,6 +73,7 @@ import LayoutSidebarLeftOpen from '@/assets/icons/layoutSidebarLeft.svg?componen
 import { useIsSmallScreen } from '@/composables/useIsSmallScreen'
 import { useSettingStore, useStatsStore, useTorrentStore } from '@/store'
 import { useSessionStore } from '@/store/session'
+import useToolbarStore from '@/components/CanvasList/store/toolbarStore'
 
 const torrentStore = useTorrentStore()
 const statsStore = useStatsStore()
@@ -84,9 +85,10 @@ const isMobile = useIsSmallScreen()
 const siderBarVisible = useLocalStorage<boolean>('siderBarVisible', true)
 const detailContainerRef = useTemplateRef<HTMLElement>('detailContainerRef')
 const pcDetailVisible = useLocalStorage<boolean>('pcDetailVisible', !isMobile.value)
+const toolbarStore = useToolbarStore()
 
 const mobileDetailVisible = computed({
-  get: () => isMobile.value && torrentStore.selectedKeys.length > 0,
+  get: () => isMobile.value && torrentStore.selectedKeys.length > 0 && !toolbarStore.selectMode,
   set: (val: boolean) => {
     if (!val) {
       torrentStore.clearSelectedKeys()

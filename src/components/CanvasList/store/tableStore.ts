@@ -2,9 +2,11 @@ import type { Torrent } from '@/api/rpc'
 import { useSettingStore, useTorrentStore } from '@/store'
 import { defineStore } from 'pinia'
 import { fitText } from '../cells/utils'
-import { calculateRowHeight, HEADER_HEIGHT, ICON_GAP, ICON_SIZE, ITEM_HEIGHT, PADDING_X } from './utils'
+import { calculateRowHeight, HEADER_HEIGHT, ICON_GAP, ICON_SIZE, ITEM_HEIGHT, PADDING_X, TOOLBAR_HEIGHT } from './utils'
 import { useCommonViewport } from './useCommonViewport'
 import { useVirtualList } from './useVirtualList'
+import useToolbarStore from './toolbarStore'
+import { useIsSmallScreen } from '@/composables/useIsSmallScreen'
 
 /**
  * 桌面端表格列表 Store
@@ -15,7 +17,8 @@ export const useTableStore = defineStore('CanvasTable', () => {
   const settingStore = useSettingStore()
   const virtualList = useVirtualList()
   const viewport = useCommonViewport()
-
+  const isMobile = useIsSmallScreen()
+  const viewTop = computed(() => (isMobile.value ? HEADER_HEIGHT + TOOLBAR_HEIGHT : HEADER_HEIGHT))
   // 桌面端特有的缓存
   const cacheRowHeights = new Map<number, { height: number; labels: string }>()
 
@@ -51,7 +54,7 @@ export const useTableStore = defineStore('CanvasTable', () => {
   const scrollHeight = computed(() => {
     const heights = cumulativeHeights.value.heights
     const totalHeight = heights.length > 0 ? heights[heights.length - 1] : 0
-    return Math.max(totalHeight + HEADER_HEIGHT, virtualList.clientHeight.value)
+    return Math.max(totalHeight + viewTop.value, virtualList.clientHeight.value)
   })
 
   // 渲染高度计算
@@ -166,7 +169,6 @@ export const useTableStore = defineStore('CanvasTable', () => {
   return {
     // 继承虚拟列表基础功能
     ...virtualList,
-
     // 继承视口管理功能
     startY: viewport.startY,
     startX: viewport.startX,
@@ -181,6 +183,7 @@ export const useTableStore = defineStore('CanvasTable', () => {
     scrollHeight,
     renderHeight,
     cumulativeHeights,
-    ellipsisTxtMap
+    ellipsisTxtMap,
+    viewTop
   }
 })

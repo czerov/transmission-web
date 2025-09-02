@@ -5,6 +5,7 @@ import type { MobileRowHeightInfo } from '../MobileCells'
 import { calculateMobileRowHeightInfo } from './mobileUtils'
 import { useCommonViewport } from './useCommonViewport'
 import { useVirtualList } from './useVirtualList'
+import { TOOLBAR_HEIGHT } from './utils'
 
 /**
  * 移动端卡片列表 Store
@@ -66,7 +67,7 @@ export const useCardStore = defineStore('CanvasCard', () => {
   const scrollHeight = computed(() => {
     const heights = cumulativeHeights.value.heights
     const totalHeight = heights.length > 0 ? heights[heights.length - 1] : 0
-    return Math.max(totalHeight, virtualList.clientHeight.value)
+    return Math.max(totalHeight + TOOLBAR_HEIGHT, virtualList.clientHeight.value)
   })
 
   // 监听滚动条位置和窗口高度变化
@@ -98,7 +99,6 @@ export const useCardStore = defineStore('CanvasCard', () => {
   return {
     // 继承虚拟列表基础功能
     ...virtualList,
-
     // 继承视口管理功能（只使用行相关的）
     startY: viewport.startY,
     renderStartIdx: viewport.renderStartIdx,

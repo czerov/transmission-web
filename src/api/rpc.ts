@@ -48,7 +48,7 @@ let sessionId = ''
 
 const instance: AxiosInstance = axios.create({
   baseURL: getBaseURL(),
-  timeout: 10000
+  timeout: 600000
 })
 
 // 初始化认证信息

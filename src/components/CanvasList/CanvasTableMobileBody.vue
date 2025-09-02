@@ -1,5 +1,9 @@
 <template>
-  <div class="canvas-mobile-body-wrapper" ref="bodyWrapper" :style="{ height: canvasHeight + 'px', width: '100%' }">
+  <div
+    class="canvas-mobile-body-wrapper"
+    ref="bodyWrapper"
+    :style="{ height: canvasHeight + 'px', width: '100%', top: top }"
+  >
     <canvas class="canvas-mobile-body" ref="bodyCanvas"></canvas>
   </div>
   <RowMenu v-model:show="showDropdown" :x="rowMenuX" :y="rowMenuY" to="body" :id="rowMenuId" />
@@ -11,11 +15,13 @@ import { useSettingStore, useTorrentStore } from '@/store'
 import type { AnyTouchEvent } from 'any-touch'
 import { useThemeVars } from 'naive-ui'
 import { useCardStore } from './store/cardStore'
+import useToolbarStore from './store/toolbarStore'
 import RowMenu from '../TorrentList/RowMenu.vue'
 import { MOBILE_CARD_MARGIN, MOBILE_CARD_MIN_HEIGHT, MOBILE_CARD_PADDING } from './store/mobileUtils'
 import { DEFAULT_MOBILE_CELLS } from './MobileCells'
 import { isClickInMenuButton } from './MobileCells/NameCell'
 import { roundRect } from './cells/utils'
+import { TOOLBAR_HEIGHT } from './store/utils'
 
 defineExpose({
   onMouseMove,
@@ -28,6 +34,7 @@ const bodyCanvas = useTemplateRef<HTMLCanvasElement>('bodyCanvas')
 const cardStore = useCardStore()
 const torrentStore = useTorrentStore()
 const settingStore = useSettingStore()
+const toolbarStore = useToolbarStore()
 const filteredTorrents = computed(() => torrentStore.filterTorrents)
 const mapSelectedKeys = computed(() => torrentStore.mapSelectedKeys)
 const canvasWidth = computed(() => cardStore.clientWidth) // 全屏宽度
@@ -41,6 +48,7 @@ const hoverRowIndex = ref<number | null>(null)
 const theme = useThemeVars()
 let rafId: number | null = null
 const rowMenuId = ref<number | undefined>()
+const top = computed(() => TOOLBAR_HEIGHT + 'px')
 
 const updateSize = () => {
   const dpr = window.devicePixelRatio || 1
@@ -225,7 +233,7 @@ function getRowIndex(e: MouseEvent | AnyTouchEvent) {
   const wrapper = e.target as HTMLElement
   const rect = wrapper.getBoundingClientRect()
   const clickY = 'clientY' in e ? e.clientY : e.y
-  const offsetY = clickY - rect.top
+  const offsetY = clickY - rect.top - TOOLBAR_HEIGHT
   // 使用累积高度查找点击的行
   const heights = cardStore.cumulativeHeights.heights
   for (let i = 0; i < heights.length; i++) {
@@ -240,6 +248,8 @@ function getRowIndex(e: MouseEvent | AnyTouchEvent) {
 function isMenuButtonClicked(e: MouseEvent, rowIndex: number): boolean {
   const clickX = e.clientX
   const clickY = e.clientY
+  const react = bodyWrapper.value?.getBoundingClientRect()
+  console.debug('isMenuButtonClicked', react?.top)
   // 计算NameCell的位置和尺寸
   const heights = cardStore.cumulativeHeights.heights
   const mapRowHeights = cardStore.cumulativeHeights.mapRowHeights
@@ -256,8 +266,7 @@ function isMenuButtonClicked(e: MouseEvent, rowIndex: number): boolean {
     (mapRowHeights.get(startRow.id) || 0) -
     currentRowHeight +
     MOBILE_CARD_MARGIN
-  // 56是 header 的高度
-  const y = clickY - cardY - 56
+  const y = clickY - cardY - (react?.top || 0)
   return isClickInMenuButton(clickX, y, canvasWidth.value)
 }
 
@@ -309,10 +318,14 @@ function onRowClick(e: MouseEvent) {
       showRowMenu(e, row)
       return
     }
-
-    // 移动端简化选择逻辑，不支持多选
-    torrentStore.setSelectedKeys([row.id])
-    torrentStore.setLastSelectedIndex(rowIndex)
+    if (toolbarStore.selectMode) {
+      torrentStore.toggleSelectedKey(row.id)
+      torrentStore.setLastSelectedIndex(rowIndex)
+      return
+    } else {
+      torrentStore.setSelectedKeys([row.id])
+      torrentStore.setLastSelectedIndex(rowIndex)
+    }
   }
 }
 

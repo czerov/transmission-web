@@ -1,6 +1,7 @@
 <template>
   <div class="canvas-mobile-list-wrapper" ref="canvasMobileListWrapperRef">
     <div class="canvas-mobile-list-container" ref="canvasMobileListContainerRef" @scroll="onScroll">
+      <ToolbarView />
       <CanvasTableMobileBody ref="canvasTableMobileBodyRef" />
       <div
         tabindex="-1"
@@ -19,6 +20,7 @@
 <script setup lang="ts">
 import CanvasTableMobileBody from './CanvasTableMobileBody.vue'
 import { useCardStore } from './store/cardStore'
+import { TOOLBAR_HEIGHT } from './store/utils'
 
 const props = defineProps<{
   listHeight: number
@@ -32,6 +34,10 @@ const canvasMobileListContainerRef = useTemplateRef<HTMLElement>('canvasMobileLi
 const bodyRef = ref(document.body)
 const bodyHeight = ref(document.body.clientHeight || document.documentElement.clientHeight)
 
+onMounted(() => {
+  canvasMobileListContainerRef.value!.scrollTop = cardStore.scrollTop
+})
+
 watch(
   () => props.listHeight,
   (newHeight) => {
@@ -44,8 +50,7 @@ watch(
         }
       })
     }
-    // 移动端不需要减去header高度，因为不显示table header
-    cardStore.setClientHeight(newHeight)
+    cardStore.setClientHeight(newHeight - TOOLBAR_HEIGHT)
   },
   {
     immediate: true

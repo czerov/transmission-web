@@ -1,7 +1,12 @@
 <template>
   <div class="canvas-list-warpper" ref="canvasListWrapperRef">
     <div class="canvas-list-container" ref="canvasListContainerRef" @scroll="onScroll">
-      <TorrentListHeader v-model:showHeaderMenu="showHeaderMenu" is-sticky-select-all />
+      <ToolbarView v-if="isMobile" />
+      <ListHeader
+        v-model:showHeaderMenu="showHeaderMenu"
+        is-sticky-select-all
+        :style="{ top: isMobile ? TOOLBAR_HEIGHT + 'px' : '0px' }"
+      />
       <CanvasTableBody ref="canvasTableBodyRef" />
       <div
         tabindex="-1"
@@ -19,11 +24,12 @@
   </div>
 </template>
 <script setup lang="ts">
+import { useIsSmallScreen } from '@/composables/useIsSmallScreen'
 import { useTorrentStore } from '@/store'
+import type { AnyTouchEvent } from 'any-touch'
 import CanvasTableBody from './CanvasTableBody.vue'
 import { useTableStore } from './store/tableStore'
-import type { AnyTouchEvent } from 'any-touch'
-import { HEADER_HEIGHT } from './store/utils'
+import { TOOLBAR_HEIGHT } from './store/utils'
 
 const props = defineProps<{
   listHeight: number
@@ -37,6 +43,11 @@ const canvasTableBodyRef = useTemplateRef<InstanceType<typeof CanvasTableBody>>(
 const canvasListWrapperRef = useTemplateRef<HTMLElement>('canvasListWrapperRef')
 const canvasListContainerRef = useTemplateRef<HTMLElement>('canvasListContainerRef')
 const bodyHeight = ref(document.body.clientHeight || document.documentElement.clientHeight)
+const isMobile = useIsSmallScreen()
+
+onMounted(() => {
+  canvasListContainerRef.value!.scrollTop = tableStore.scrollTop
+})
 
 watch(
   () => props.listHeight,
@@ -51,7 +62,7 @@ watch(
       })
     }
     // 去掉固定的table header
-    tableStore.setClientHeight(newHeight - HEADER_HEIGHT)
+    tableStore.setClientHeight(newHeight - tableStore.viewTop)
   },
   {
     immediate: true

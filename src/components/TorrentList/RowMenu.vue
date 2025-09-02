@@ -154,7 +154,8 @@ watch(
 const closeDropdown = (e: any) => {
   if (
     e.target instanceof HTMLElement &&
-    (e.target.closest('.row-drop-down-menus') || e.target.closest('.canvas-mobile-list-scroll-holder'))
+    (e.target.closest('.row-drop-down-menus') ||
+      e.target.closest('.canvas-mobile-list-scroll-holder, .canvas-list-scroll-holder'))
   ) {
     return
   }

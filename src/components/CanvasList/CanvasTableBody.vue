@@ -1,16 +1,19 @@
 <template>
   <div
     class="canvas-body-wrapper"
-    :style="{ height: canvasHeight + 'px', width: containerWidth + 'px', top: HEADER_HEIGHT + 'px' }"
+    :style="{ height: canvasHeight + 'px', width: containerWidth + 'px', top: tableStore.viewTop + 'px' }"
   >
-    <canvas class="canvas-select" v-if="isSupportTouch" ref="bodyCanvasSelect"></canvas>
+    <canvas class="canvas-select" v-if="toolbarStore.selectMode" ref="bodyCanvasSelect"></canvas>
     <canvas class="canvas-body" ref="bodyCanvas"></canvas>
   </div>
-  <RowMenu v-model:show="showDropdown" :x="rowMenuX" :y="rowMenuY" to="body" />
+  <RowMenu v-model:show="showDropdown" :x="rowMenuX" :y="rowMenuY" to="body" :id="rowMenuId" />
 </template>
 <script setup lang="ts">
 import type { Torrent } from '@/api/rpc'
+import checkboxCheckedIconUrl from '@/assets/icons/checkboxchecked.svg?raw'
+import checkboxUncheckedIconUrl from '@/assets/icons/checkboxunchecked.svg?raw'
 import { useSettingStore, useTorrentStore } from '@/store'
+import { isSupportTouch } from '@/utils/evt'
 import { isMac } from '@/utils/index'
 import type { AnyTouchEvent } from 'any-touch'
 import { useThemeVars } from 'naive-ui'
@@ -32,11 +35,8 @@ import TimeCell from './cells/TimeCell'
 import UpDownRatioCell from './cells/UpDownRatioCell'
 import { drawIcon, drawLine, getIconImg } from './cells/utils'
 import { useTableStore } from './store/tableStore'
-import checkboxCheckedIconUrl from '@/assets/icons/checkboxchecked.svg?raw'
-import checkboxUncheckedIconUrl from '@/assets/icons/checkboxunchecked.svg?raw'
-import { ITEM_HEIGHT, HEADER_HEIGHT } from './store/utils'
-import { isSupportTouch } from '@/utils/evt'
-
+import useToolbarStore from './store/toolbarStore'
+import { ITEM_HEIGHT } from './store/utils'
 defineExpose({
   onMouseMove,
   onMouseLeave,
@@ -48,6 +48,7 @@ defineExpose({
 const tableStore = useTableStore()
 const torrentStore = useTorrentStore()
 const settingStore = useSettingStore()
+const toolbarStore = useToolbarStore()
 const filteredTorrents = computed(() => torrentStore.filterTorrents)
 const mapSelectedKeys = computed(() => torrentStore.mapSelectedKeys)
 const visibleColumns = computed(() => torrentStore.visibleColumns)
@@ -68,6 +69,7 @@ const theme = useThemeVars()
 const bodyCanvas = ref<HTMLCanvasElement | null>(null)
 const bodyCanvasSelect = ref<HTMLCanvasElement | null>(null)
 let rafId: number | null = null
+const rowMenuId = ref<number | undefined>()
 
 const cellRender: Record<string, typeof DefaultCell> = {
   name: NameCell,
@@ -307,7 +309,7 @@ function getRowIndex(e: MouseEvent | AnyTouchEvent) {
   const wrapper = e.target as HTMLElement
   const rect = wrapper.getBoundingClientRect()
   const clickY = 'clientY' in e ? e.clientY : e.y
-  const offsetY = clickY - rect.top - HEADER_HEIGHT
+  const offsetY = clickY - rect.top - tableStore.viewTop
   const heights = tableStore.cumulativeHeights.heights
   for (let i = 0; i < heights.length; i++) {
     if (offsetY < heights[i]) {
@@ -338,19 +340,15 @@ function onMouseLeave() {
 
 function onRowClick(e: MouseEvent) {
   const rowIndex = getRowIndex(e)
-
-  if (rowIndex === null) {
+  e.preventDefault()
+  e.stopPropagation()
+  if (showDropdown.value || rowIndex === null) {
+    showDropdown.value = false
     return
   }
   if (tableStore.visibleStart <= rowIndex && rowIndex <= tableStore.visibleEnd) {
     const row = filteredTorrents.value[rowIndex]
     if (!row) {
-      return
-    }
-    // 认为点击了checkbox
-    if (e.clientX < 32) {
-      torrentStore.toggleSelectedKey(row.id)
-      torrentStore.setLastSelectedIndex(rowIndex)
       return
     }
     const isCtrl = e.ctrlKey
@@ -363,8 +361,13 @@ function onRowClick(e: MouseEvent) {
       torrentStore.toggleSelectedKey(row.id)
       torrentStore.setLastSelectedIndex(rowIndex)
     } else {
-      torrentStore.setSelectedKeys([row.id])
-      torrentStore.setLastSelectedIndex(rowIndex)
+      if (toolbarStore.selectMode) {
+        torrentStore.toggleSelectedKey(row.id)
+        torrentStore.setLastSelectedIndex(rowIndex)
+      } else {
+        torrentStore.setSelectedKeys([row.id])
+        torrentStore.setLastSelectedIndex(rowIndex)
+      }
     }
   }
 }
@@ -381,6 +384,7 @@ function onRowContextMenu(e: MouseEvent) {
       torrentStore.setSelectedKeys([row.id])
     }
     if (row) {
+      rowMenuId.value = row.id
       showDropdown.value = true
       rowMenuX.value = e.clientX
       rowMenuY.value = e.clientY
@@ -397,6 +401,7 @@ function handleLongtap(e: AnyTouchEvent) {
   if (tableStore.visibleStart <= rowIndex && rowIndex <= tableStore.visibleEnd) {
     const row = filteredTorrents.value[rowIndex]
     if (row) {
+      rowMenuId.value = row.id
       showDropdown.value = true
       rowMenuX.value = e.x
       rowMenuY.value = e.y
@@ -416,7 +421,6 @@ function onKeyDown(event: KeyboardEvent) {
 
 onMounted(() => {
   nextTick(() => {
-    // bodyCanvas.value!.style.top = HEADER_HEIGHT + 'px'
     updateSize()
     drawBody()
   })
@@ -457,7 +461,8 @@ const renderTriggers = computed(() => ({
   scrollTop: tableStore.scrollTop,
   scrollLeft: tableStore.scrollLeft,
   // 主题相关
-  themeId: settingStore.setting.theme
+  themeId: settingStore.setting.theme,
+  selectMode: toolbarStore.selectMode
 }))
 
 // 替换多个 watch 为单个合并的 watch
@@ -471,7 +476,8 @@ watch(
       newVal.clientHeight !== oldVal?.clientHeight ||
       newVal.clientWidth !== oldVal?.clientWidth ||
       newVal.tableMinWidth !== oldVal?.tableMinWidth ||
-      newVal.visibleColumns !== oldVal?.visibleColumns
+      newVal.visibleColumns !== oldVal?.visibleColumns ||
+      newVal.selectMode !== oldVal?.selectMode
     ) {
       needsResize = true
     }

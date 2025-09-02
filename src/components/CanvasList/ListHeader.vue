@@ -8,7 +8,7 @@
     <div
       class="torrent-table-header-cell-checkbox"
       :class="{ 'torrent-table-header-cell-checkbox-sticky': isStickySelectAll }"
-      v-if="isSupportTouch"
+      v-if="toolbarStore.selectMode"
     >
       <n-checkbox
         :checked="torrentStore.selectedKeys.length === torrentStore.filterTorrents.length"
@@ -51,10 +51,12 @@
 <script setup lang="ts">
 import { allColumns } from '@/composables/useColumns'
 import { useTorrentStore } from '@/store'
+import useToolbarStore from './store/toolbarStore'
 import { isSupportTouch } from '@/utils/evt'
 import { CaretDown, CaretUp } from '@vicons/ionicons5'
 import type { AnyTouchEvent } from 'any-touch'
 import type { CSSProperties } from 'vue'
+const toolbarStore = useToolbarStore()
 
 withDefaults(
   defineProps<{
