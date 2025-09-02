@@ -81,6 +81,18 @@ docker build -t transmission-web .
 ```bash
 docker run -d -p 7632:7632 jianxcao/transmission-web
 ```
+### 运行容器 docker-compose
+``` bash
+services:
+  tr-web:
+    image: jianxcao/transmission-web
+    container_name: tr-web
+    environment:
+      - BACKEND_URL=http://192.168.50.23:9091
+    ports:
+      - "7632:7632"
+    restart: unless-stopped
+```
 
 
 ## 配置transmission docker 运行

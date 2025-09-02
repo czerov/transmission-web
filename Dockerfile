@@ -29,7 +29,8 @@ ENV CGO_ENABLED=1 \
     PUID=0 \
     PGID=0 \
     UMASK=000 \
-    PORT=7632
+    PORT=7632 \
+    BACKEND_URL=http://localhost:9091
 
 
 RUN mkdir -p /app/static
