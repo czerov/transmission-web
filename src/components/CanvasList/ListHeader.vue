@@ -55,6 +55,7 @@ import useToolbarStore from './store/toolbarStore'
 import { CaretDown, CaretUp } from '@vicons/ionicons5'
 import type { AnyTouchEvent } from 'any-touch'
 import type { CSSProperties } from 'vue'
+import { debounce } from 'lodash-es'
 const toolbarStore = useToolbarStore()
 
 withDefaults(
@@ -210,9 +211,10 @@ function longtap(e: AnyTouchEvent) {
   columnMenuY.value = e.y
 }
 
-function onColumnClick(key: string) {
+// 防抖的列点击处理函数
+const onColumnClick = debounce((key: string) => {
   torrentStore.setSort(key)
-}
+}, 10)
 
 function onCheckboxChange(checked: boolean) {
   if (checked) {
