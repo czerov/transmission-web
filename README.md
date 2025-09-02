@@ -103,6 +103,7 @@ services:
 
 ## 界面预览
 ![面板](./docs/imgs/dashborad.png)
+![移动端卡片](./docs/imgs/mobileCard.png)
 ![移动端面板](./docs/imgs/mobileDashborad.png)
 ![移动端菜单](./docs/imgs/mobileSiderbar.png)
 ![添加种子](./docs/imgs/add.png)
