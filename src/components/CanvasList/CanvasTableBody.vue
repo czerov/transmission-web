@@ -13,7 +13,6 @@ import type { Torrent } from '@/api/rpc'
 import checkboxCheckedIconUrl from '@/assets/icons/checkboxchecked.svg?raw'
 import checkboxUncheckedIconUrl from '@/assets/icons/checkboxunchecked.svg?raw'
 import { useSettingStore, useTorrentStore } from '@/store'
-import { isSupportTouch } from '@/utils/evt'
 import { isMac } from '@/utils/index'
 import type { AnyTouchEvent } from 'any-touch'
 import { useThemeVars } from 'naive-ui'
@@ -59,7 +58,7 @@ const rowMenuY = ref(0)
 const showDropdown = ref(false)
 
 const containerWidth = computed(() => {
-  return isSupportTouch ? canvasWidth.value + checkboxWidth : canvasWidth.value
+  return toolbarStore.selectMode ? canvasWidth.value + checkboxWidth : canvasWidth.value
 })
 
 // 开始渲染的偏移
@@ -142,16 +141,8 @@ const updateSize = () => {
   }
 }
 
-const computedStartX = computed(() => {
-  let x = 0
-  for (let i = 0; i < tableStore.visibleStartCol; i++) {
-    x += visibleColumns.value[i].width
-  }
-  return x
-})
-
 function drawCells(ctx: CanvasRenderingContext2D, row: Torrent, rowHeight: number, y: number) {
-  let x = computedStartX.value
+  let x = tableStore.startX
   for (let i = tableStore.visibleStartCol; i <= tableStore.visibleEndCol; i++) {
     const col = visibleColumns.value[i]
     const render = cellRender[col.key] || DefaultCell
@@ -460,7 +451,8 @@ const renderTriggers = computed(() => ({
   scrollLeft: tableStore.scrollLeft,
   // 主题相关
   themeId: settingStore.setting.theme,
-  selectMode: toolbarStore.selectMode
+  selectMode: toolbarStore.selectMode,
+  singleLine: settingStore.setting.singleLine
 }))
 
 // 替换多个 watch 为单个合并的 watch
@@ -475,7 +467,8 @@ watch(
       newVal.clientWidth !== oldVal?.clientWidth ||
       newVal.tableMinWidth !== oldVal?.tableMinWidth ||
       newVal.visibleColumns !== oldVal?.visibleColumns ||
-      newVal.selectMode !== oldVal?.selectMode
+      newVal.selectMode !== oldVal?.selectMode ||
+      newVal.singleLine !== oldVal?.singleLine
     ) {
       needsResize = true
     }

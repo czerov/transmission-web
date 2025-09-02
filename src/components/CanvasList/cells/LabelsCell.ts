@@ -1,8 +1,9 @@
 import type { Torrent } from '@/api/rpc'
 import type { ColumnConfig } from '@/composables/useColumns'
 import { PADDING_X, TAG_HEIGHT, TAG_PADDING, TAG_MARGIN, TAG_LINE_HEIGHT } from '../store/utils'
-import { roundRect } from './utils'
+import { drawText, roundRect } from './utils'
 import { useSettingStore } from '@/store'
+import { useTableStore } from '../store/tableStore'
 
 // 绘制圆角矩形
 function drawRoundedRect(
@@ -38,6 +39,20 @@ export default function renderLabelsCell(
     ctx.restore()
     return
   }
+  const settingStore = useSettingStore()
+  const tableStore = useTableStore()
+  const singleLine = settingStore.setting.singleLine
+  if (singleLine) {
+    let value = row.labels.join(',')
+    const ellipsisTxtMap = tableStore.ellipsisTxtMap
+    const eVal = ellipsisTxtMap.get(row.id)?.[col.key]?.fitTxt
+    if (eVal) {
+      value = eVal as string
+    }
+    drawText(ctx, value, state.x + PADDING_X, state.y, col.width, state.rowHeight)
+    ctx.restore()
+    return
+  }
 
   const cellX = state.x + PADDING_X
   const cellY = state.y + PADDING_X / 2
@@ -49,7 +64,6 @@ export default function renderLabelsCell(
   // 设置字体
   ctx.textAlign = 'left'
   ctx.textBaseline = 'middle'
-  const settingStore = useSettingStore()
   const themeVars = settingStore.themeVars
   for (const label of row.labels) {
     // 测量文本宽度

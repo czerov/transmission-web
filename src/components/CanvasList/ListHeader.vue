@@ -52,7 +52,6 @@
 import { allColumns } from '@/composables/useColumns'
 import { useTorrentStore } from '@/store'
 import useToolbarStore from './store/toolbarStore'
-import { isSupportTouch } from '@/utils/evt'
 import { CaretDown, CaretUp } from '@vicons/ionicons5'
 import type { AnyTouchEvent } from 'any-touch'
 import type { CSSProperties } from 'vue'
@@ -72,7 +71,8 @@ const torrentStore = useTorrentStore()
 const visibleColumns = computed(() => torrentStore.visibleColumns)
 const tableMinWidth = computed(() => torrentStore.tableMinWidth)
 const width = computed(() => {
-  return (isSupportTouch ? tableMinWidth.value + 24 : tableMinWidth.value) + 'px'
+  return (toolbarStore.selectMode ? tableMinWidth.value + 24 : tableMinWidth.value) + 'px'
+  // return tableMinWidth.value + 'px'
 })
 const minColumnWidth = computed(() => {
   return allColumns.reduce(
@@ -235,8 +235,10 @@ function onCheckboxChange(checked: boolean) {
 }
 .torrent-table-header-cell-checkbox {
   background: var(--table-color);
-  width: 24px;
-  padding-inline: 4px;
+  :deep(.n-checkbox) {
+    margin: 0;
+    padding-inline: 4px;
+  }
 }
 .torrent-table-header-cell-checkbox-sticky {
   position: sticky;

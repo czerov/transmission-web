@@ -5,7 +5,6 @@ import { fitText } from '../cells/utils'
 import { calculateRowHeight, HEADER_HEIGHT, ICON_GAP, ICON_SIZE, ITEM_HEIGHT, PADDING_X, TOOLBAR_HEIGHT } from './utils'
 import { useCommonViewport } from './useCommonViewport'
 import { useVirtualList } from './useVirtualList'
-import useToolbarStore from './toolbarStore'
 import { useIsSmallScreen } from '@/composables/useIsSmallScreen'
 
 /**
@@ -37,7 +36,12 @@ export const useTableStore = defineStore('CanvasTable', () => {
         mapRowHeights.set(torrent.id, cacheData.height)
         continue
       }
-      const height = calculateRowHeight(torrent, mapColumnWidth['labels'], settingStore.themeVars)
+      const height = calculateRowHeight(
+        torrent,
+        mapColumnWidth['labels'],
+        settingStore.setting.singleLine,
+        settingStore.themeVars
+      )
       mapRowHeights.set(torrent.id, height)
       cacheRowHeights.set(torrent.id, { height, labels: torrent.labels.toString() })
       total += height
@@ -168,7 +172,8 @@ export const useTableStore = defineStore('CanvasTable', () => {
       () => settingStore.themeVars.fontSize,
       () => settingStore.themeVars.fontFamily,
       () => torrentStore.mapColumnWidth,
-      () => torrentStore.visibleColumns.find((col) => col.key === 'labels')?.visible
+      () => torrentStore.visibleColumns.find((col) => col.key === 'labels')?.visible,
+      () => settingStore.setting.singleLine
     ],
     () => {
       ellipsisTxtMap.value = new Map()

@@ -40,6 +40,7 @@ export const useSettingStore = defineStore('setting', () => {
       defaultTrackers: DEFAULT_TRACKERS,
       domain: window.location.origin,
       savePassword: false,
+      singleLine: true,
       auth: '',
       polling: {
         sessionInterval: 60,

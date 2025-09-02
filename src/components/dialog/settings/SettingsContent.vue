@@ -54,6 +54,7 @@ import { rpc, type SessionArguments } from '@/api/rpc'
 import { useSettingStore } from '@/store/setting'
 import { useMessage } from 'naive-ui'
 import { useSessionStore } from '@/store'
+import { omit } from 'lodash-es'
 const sessionStore = useSessionStore()
 
 interface Props {
@@ -163,6 +164,7 @@ const formInit = () => {
   // 其他设置
   sessionForm.value['script-torrent-done-filename'] = session.value?.['script-torrent-done-filename'] || ''
   sessionForm.value['script-torrent-done-enabled'] = !!session.value?.['script-torrent-done-enabled']
+  sessionForm.value['single-line'] = !!settingStore.setting.singleLine
   sessionForm.value['default-trackers'] =
     session.value?.['default-trackers'] || settingStore.setting.defaultTrackers.join('\n')
 }
@@ -185,7 +187,8 @@ async function onSave() {
     if (pollingForm.value) {
       settingStore.setPolling(pollingForm.value)
     }
-    await rpc.sessionSet(sessionForm.value)
+    settingStore.setting.singleLine = !!sessionForm.value['single-line']
+    await rpc.sessionSet(omit(sessionForm.value, ['single-line']))
     message.success('保存成功')
     emit('save-success')
   } catch {

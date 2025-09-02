@@ -35,8 +35,12 @@ export const calculateTagWidth = (tag: string, theme: ThemeCommonVars & CustomTh
 export const calculateRowHeight = (
   row: Torrent,
   columnWidth: number,
+  singleLine: boolean,
   theme: ThemeCommonVars & CustomThemeCommonVars
 ) => {
+  if (singleLine) {
+    return ITEM_HEIGHT
+  }
   const labels = row.labels || []
   if (!labels || labels.length === 0) {
     return ITEM_HEIGHT

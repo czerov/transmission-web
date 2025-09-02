@@ -3,6 +3,9 @@
     <div class="text-lg font-medium mb-2">其他设置</div>
 
     <n-form label-placement="left" label-width="200" :model="form">
+      <n-form-item label="单行显示">
+        <n-switch v-model:value="form['single-line']" />
+      </n-form-item>
       <n-form-item>
         <template #label>
           <n-checkbox v-model:checked="form['script-torrent-done-enabled']"> 启用种子完成脚本 </n-checkbox>
