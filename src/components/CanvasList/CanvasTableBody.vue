@@ -340,8 +340,6 @@ function onMouseLeave() {
 
 function onRowClick(e: MouseEvent) {
   const rowIndex = getRowIndex(e)
-  e.preventDefault()
-  e.stopPropagation()
   if (showDropdown.value || rowIndex === null) {
     showDropdown.value = false
     return

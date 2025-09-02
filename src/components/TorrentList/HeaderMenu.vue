@@ -67,14 +67,15 @@ function onDragEnd(newList: { key: string; width: number; visible: boolean }[]) 
 function getTitle(key: string) {
   return allColumns.find((c) => c.key === key)?.title || key
 }
-
-useEventListener(document, isSupportTouch ? 'touchstart' : 'click', (e) => {
+const close = (e: Event) => {
   const target = e.target as HTMLElement
   if (target.closest('.column-selector-item') || target.closest('.column-selector-popover-content')) {
     return
   }
   emit('update:show', false)
-})
+}
+useEventListener(document, isSupportTouch ? 'touchstart' : 'mousedown', close)
+
 onKeyStroke('Escape', () => {
   emit('update:show', false)
 })

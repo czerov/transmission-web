@@ -92,7 +92,8 @@ export const useTableStore = defineStore('CanvasTable', () => {
     renderEnd: viewport.renderEndIdx.value,
     mapColumnWidth: torrentStore.mapColumnWidth,
     filterTorrents: torrentStore.filterTorrents,
-    mapRowHeights: cumulativeHeights.value.mapRowHeights
+    mapRowHeights: cumulativeHeights.value.mapRowHeights,
+    lableVisible: !!torrentStore.visibleColumns.find((col) => col.key === 'labels')?.visible
   }))
 
   watch(
@@ -102,10 +103,17 @@ export const useTableStore = defineStore('CanvasTable', () => {
       const theme = settingStore.themeVars
       ctx.reset()
       ctx.font = `${theme.fontSize} ${theme.fontFamily}`
+      const labelVisible = textComputeTriggers.value.lableVisible
 
       // TODO: 这个虽然每次都是用renderStartIdx到renderEndIdx计算一段，但是不停的 set，可能会导致数据变大很多，考虑只保存当前预渲染的所有行的数据
       const map = toRaw(unref(ellipsisTxtMap))
-      const keys = ['name', 'labels', 'downloadDir', 'cachedMainTracker', 'cachedTrackerStatus']
+      const keys = [
+        'name',
+        labelVisible ? 'labels' : '',
+        'downloadDir',
+        'cachedMainTracker',
+        'cachedTrackerStatus'
+      ].filter(Boolean) as (keyof Torrent)[]
       const mapRowHeights = cumulativeHeights.value.mapRowHeights
 
       for (let i = viewport.renderStartIdx.value; i <= viewport.renderEndIdx.value; i++) {
@@ -156,13 +164,18 @@ export const useTableStore = defineStore('CanvasTable', () => {
 
   // 主题变化时，清空桌面端行高度缓存，清空文字溢出缓存
   watch(
-    [() => settingStore.themeVars.fontSize, () => settingStore.themeVars.fontFamily],
+    [
+      () => settingStore.themeVars.fontSize,
+      () => settingStore.themeVars.fontFamily,
+      () => torrentStore.mapColumnWidth,
+      () => torrentStore.visibleColumns.find((col) => col.key === 'labels')?.visible
+    ],
     () => {
       ellipsisTxtMap.value = new Map()
       cacheRowHeights.clear()
     },
     {
-      flush: 'post'
+      flush: 'pre'
     }
   )
 
