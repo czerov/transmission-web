@@ -74,7 +74,10 @@ const close = (e: Event) => {
   }
   emit('update:show', false)
 }
-useEventListener(document, isSupportTouch ? 'touchstart' : 'mousedown', close)
+useEventListener(document, 'mousedown', close)
+if (isSupportTouch) {
+  useEventListener(document, 'touchstart', close)
+}
 
 onKeyStroke('Escape', () => {
   emit('update:show', false)
