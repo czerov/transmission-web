@@ -1,3 +1,4 @@
+import i18n from '@/i18n'
 //状态
 export const Status = {
   stopped: 0,
@@ -9,7 +10,19 @@ export const Status = {
   seeding: 6
 } as const
 
-export const StatusStrings = ['已暂停', '等待验证', '验证中', '等待下载', '下载中', '等待做种', '做种中'] as const
+export const getStatusString = (status: number) => {
+  const t = i18n.global.t
+  const StatusStrings = [
+    t('status.stopped'),
+    t('status.queuedToVerify'),
+    t('status.verifying'),
+    t('status.queuedToDownload'),
+    t('status.downloading'),
+    t('status.queuedToSeed'),
+    t('status.seeding')
+  ]
+  return StatusStrings[status]
+}
 
 const PriorityNumbers = [-1, 0, 1] as const
 
@@ -21,8 +34,12 @@ export const BandwidthPriority = {
   high: 1
 } as const
 
-export const PriorityStrings = new Map<PriorityNumberType, string>([
-  [-1, '低'],
-  [0, '正常'],
-  [1, '高']
-])
+export const getPriorityString = (priority: PriorityNumberType) => {
+  const t = i18n.global.t
+  const PriorityStrings = new Map<PriorityNumberType, string>([
+    [-1, t('priority.low')],
+    [0, t('priority.normal')],
+    [1, t('priority.high')]
+  ])
+  return PriorityStrings.get(priority)
+}

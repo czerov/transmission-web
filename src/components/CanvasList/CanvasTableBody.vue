@@ -377,7 +377,7 @@ function onRowContextMenu(e: MouseEvent) {
       showDropdown.value = true
       rowMenuX.value = e.clientX
       rowMenuY.value = e.clientY
-      console.debug('onRowContextMenu', e.clientX, e.clientY)
+      // console.debug('onRowContextMenu', e.clientX, e.clientY)
     }
   }
 }

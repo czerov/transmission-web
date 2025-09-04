@@ -1,6 +1,6 @@
-import { StatusStrings } from '@/types/tr'
+import { getStatusString } from '@/types/tr'
 import type { ThemeCommonVars } from 'naive-ui'
-import { getTextWidth, roundRect } from '../cells/utils'
+import { fitText, getTextWidth, roundRect } from '../cells/utils'
 import { MOBILE_LINE_MARGIN, MOBILE_PROGRESS_HEIGHT } from '../store/mobileUtils'
 import type { MobileCellComponent, MobileCellHeightCalculator, MobileCellRenderer } from './types'
 import { rowDark } from 'naive-ui/es/legacy-grid/styles'
@@ -108,20 +108,21 @@ function drawStatusTag(
   x: number,
   y: number,
   width: number,
+  tagHeight: number,
   theme: any
 ) {
-  const statusText = StatusStrings[status] || '-'
+  let statusText = getStatusString(status) || '-'
   const colors = getStatusColors(status, error, theme)
 
-  // 小尺寸标签
-  const tagHeight = 18
   const tagPadding = 6
-  const fontSize = parseInt(theme.fontSize) - 4 // 更小的字体
+  const fontSize = 10
 
   ctx.font = `${fontSize}px ${theme.fontFamily}`
   const textWidth = getTextWidth(ctx, statusText)
-  const tagWidth = Math.min(textWidth + tagPadding * 2, width - 8) // 确保标签不超出分配区域
-
+  const tagWidth = Math.min(textWidth + tagPadding * 2, width - 8) // 确保标签不超出分配区域，留8px边距
+  if (tagWidth > width) {
+    statusText = fitText(ctx, statusText, width - 8, tagHeight, false) as string
+  }
   // 在分配区域内右对齐，留一点边距
   const tagX = x + width - tagWidth - 4
 
@@ -154,11 +155,9 @@ const calculateHeight: MobileCellHeightCalculator = () => {
 
 // 渲染函数
 const render: MobileCellRenderer = ({ ctx, row, state, theme }) => {
-  // 固定比例分配：进度条60%，百分比20%，状态标签20%
-  const progressBarWidth = state.width * 0.7
-  const progressTextWidth = state.width * 0.15
-  const statusTagWidth = state.width * 0.15
-
+  const progressTextWidth = 55
+  const statusTagWidth = 110
+  const progressBarWidth = state.width - progressTextWidth - statusTagWidth
   // 计算各部分的X坐标
   const progressBarX = state.x
   const progressTextX = state.x + progressBarWidth
@@ -175,12 +174,12 @@ const render: MobileCellRenderer = ({ ctx, row, state, theme }) => {
     theme
   )
 
-  // 绘制百分比文字（在分配的20%区域内居中）
+  // 绘制百分比文字（在分配的区域内居中）
   drawProgressText(ctx, row.percentDone, progressTextX, state.y, progressTextWidth, MOBILE_PROGRESS_HEIGHT, theme)
 
-  // 绘制状态标签（在分配的20%区域内）
+  // 绘制状态标签
   const tagY = state.y + (MOBILE_PROGRESS_HEIGHT - 18) / 2 // 18是标签高度，居中对齐
-  drawStatusTag(ctx, row.status, !!row.error || !!row.cachedError, statusTagX, tagY, statusTagWidth, theme)
+  drawStatusTag(ctx, row.status, !!row.error || !!row.cachedError, statusTagX, tagY, statusTagWidth, 18, theme)
 }
 
 // 第四行：进度条和状态

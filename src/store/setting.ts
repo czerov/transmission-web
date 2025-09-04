@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 import { useThemeVars, type CustomThemeCommonVars, type ThemeCommonVars } from 'naive-ui'
 import { setDomain as setDomainApi, setAuth as setAuthApi } from '@/api/rpc'
+import { setLocale } from '@/i18n'
 
 const DEFAULT_TRACKERS = [
   'udp://tracker.opentrackr.org:1337/announce',
@@ -37,6 +38,7 @@ export const useSettingStore = defineStore('setting', () => {
     'setting',
     {
       theme: 'light',
+      language: 'zh-CN',
       defaultTrackers: DEFAULT_TRACKERS,
       domain: window.location.origin,
       savePassword: false,
@@ -69,6 +71,13 @@ export const useSettingStore = defineStore('setting', () => {
 
   setDomain(setting.value.domain)
 
+  // 初始化语言设置
+  watchEffect(() => {
+    if (setting.value.language) {
+      setLocale(setting.value.language)
+    }
+  })
+
   const serverHost = computed(() => {
     return setting.value.domain.replace(/^https?:\/\//, '')
   })
@@ -99,6 +108,11 @@ export const useSettingStore = defineStore('setting', () => {
 
   function setTheme(val: string) {
     setting.value.theme = val
+  }
+
+  function setLanguage(val: string) {
+    setting.value.language = val
+    setLocale(val)
   }
 
   function setThemeVars(val: ThemeCommonVars & CustomThemeCommonVars) {
@@ -147,6 +161,7 @@ export const useSettingStore = defineStore('setting', () => {
   return {
     setting,
     setTheme,
+    setLanguage,
     themeVars,
     setThemeVars,
     safeArea,

@@ -1,23 +1,29 @@
 <template>
   <div>
-    <div class="text-lg font-medium mb-2">其他设置</div>
+    <div class="text-lg font-medium mb-2">{{ $t('otherSettings.title') }}</div>
 
-    <n-form label-placement="left" label-width="200" :model="form">
-      <n-form-item label="单行显示">
+    <n-form :label-placement="labelType" :label-width="labelType === 'top' ? undefined : 220" :model="form">
+      <n-form-item :label="$t('otherSettings.singleLine')">
         <n-switch v-model:value="form['single-line']" />
       </n-form-item>
       <n-form-item>
         <template #label>
-          <n-checkbox v-model:checked="form['script-torrent-done-enabled']"> 启用种子完成脚本 </n-checkbox>
+          <n-checkbox v-model:checked="form['script-torrent-done-enabled']">{{
+            $t('otherSettings.enableScript')
+          }}</n-checkbox>
         </template>
-        <n-input v-model:value="form['script-torrent-done-filename']" placeholder="是否启用种子完成脚本" class="w-80" />
+        <n-input
+          v-model:value="form['script-torrent-done-filename']"
+          :placeholder="$t('otherSettings.scriptPlaceholder')"
+          class="w-80"
+        />
       </n-form-item>
-      <n-form-item label="默认tracker列表">
+      <n-form-item :label="$t('otherSettings.defaultTrackers')">
         <n-input
           type="textarea"
           :autosize="{ minRows: 5, maxRows: 10 }"
           v-model:value="form['default-trackers']"
-          placeholder="默认tracker列表"
+          :placeholder="$t('otherSettings.defaultTrackersPlaceholder')"
           class="w-80"
         />
       </n-form-item>
@@ -26,5 +32,10 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import { useIsSmallScreen } from '@/composables/useIsSmallScreen'
+const isMobile = useIsSmallScreen()
+const labelType = computed(() => (isMobile ? 'top' : 'left'))
+const { t: $t } = useI18n()
 const form = defineModel<any>('form', { required: true })
 </script>

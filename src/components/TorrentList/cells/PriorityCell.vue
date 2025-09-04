@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Torrent } from '@/api/rpc'
-import { PriorityStrings, type PriorityNumberType } from '@/types/tr'
+import { getPriorityString, type PriorityNumberType } from '@/types/tr'
 interface Column {
   key: string
   title: string
@@ -23,7 +23,7 @@ const type = computed(() => {
 <template>
   <div>
     <n-tag :type="type" size="small" round :bordered="false">
-      {{ PriorityStrings.get(value as PriorityNumberType) }}
+      {{ getPriorityString(value as PriorityNumberType) }}
     </n-tag>
   </div>
 </template>

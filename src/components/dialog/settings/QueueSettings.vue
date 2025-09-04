@@ -1,11 +1,13 @@
 <template>
   <div>
-    <div class="text-lg font-medium mb-2">队列设置</div>
+    <div class="text-lg font-medium mb-2">{{ $t('queueSettings.title') }}</div>
 
-    <n-form label-placement="left" label-width="270" :model="form">
+    <n-form :label-placement="labelType" :label-width="labelType === 'top' ? undefined : 270" :model="form">
       <n-form-item label-align="left">
         <template #label>
-          <n-checkbox v-model:checked="form['download-queue-enabled']"> 启用下载队列，最大同时下载数 </n-checkbox>
+          <n-checkbox v-model:checked="form['download-queue-enabled']">{{
+            $t('queueSettings.enableDownloadQueue')
+          }}</n-checkbox>
         </template>
         <n-input-number
           v-model:value="form['download-queue-size']"
@@ -18,7 +20,9 @@
 
       <n-form-item label-align="left">
         <template #label>
-          <n-checkbox v-model:checked="form['seed-queue-enabled']"> 启用上传队列，最大同时上传数 </n-checkbox>
+          <n-checkbox v-model:checked="form['seed-queue-enabled']">{{
+            $t('queueSettings.enableSeedQueue')
+          }}</n-checkbox>
         </template>
         <n-input-number
           v-model:value="form['seed-queue-size']"
@@ -31,7 +35,9 @@
 
       <n-form-item label-align="left">
         <template #label>
-          <n-checkbox v-model:checked="form['queue-stalled-enabled']"> 种子超过该时间无流量，移出队列 </n-checkbox>
+          <n-checkbox v-model:checked="form['queue-stalled-enabled']">{{
+            $t('queueSettings.queueStalledEnabled')
+          }}</n-checkbox>
         </template>
         <div class="flex items-center gap-2">
           <n-input-number
@@ -41,7 +47,7 @@
             :disabled="!form['queue-stalled-enabled']"
             class="w-32"
           />
-          <span>分钟</span>
+          <span>{{ $t('common.minutes') }}</span>
         </div>
       </n-form-item>
     </n-form>
@@ -49,6 +55,11 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import { useIsSmallScreen } from '@/composables/useIsSmallScreen'
+const isMobile = useIsSmallScreen()
+const labelType = computed(() => (isMobile ? 'top' : 'left'))
+const { t: $t } = useI18n()
 const form = defineModel<any>('form', { required: true })
 
 // 设置默认值

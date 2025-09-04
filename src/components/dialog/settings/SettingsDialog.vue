@@ -2,7 +2,7 @@
   <n-modal
     v-model:show="show"
     preset="dialog"
-    title="参数设置"
+    :title="$t('settingsDialog.title')"
     :close-on-esc="true"
     @close="onCancel"
     :class="$style['settings-dialog']"
@@ -20,7 +20,9 @@
 
 <script setup lang="ts">
 import SettingsContent from './SettingsContent.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t: $t } = useI18n()
 const show = defineModel<boolean>('show', { required: true })
 
 // 保存成功
@@ -37,8 +39,8 @@ function onCancel() {
 <style lang="less" module>
 @import '@/styles/mix.less';
 .settings-dialog {
-  width: 800px !important;
-  max-width: 90vw !important;
+  width: 850px !important;
+  max-width: 95vw !important;
   padding: 0 !important;
   box-sizing: border-box;
   .settingsContentClass {

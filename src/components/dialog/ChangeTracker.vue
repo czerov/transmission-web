@@ -2,30 +2,30 @@
   <n-modal
     v-model:show="show"
     preset="dialog"
-    title="修改种子tracker"
+    :title="$t('changeTracker.title')"
     :close-on-esc="true"
-    class="w-auto! max-w-[600px]"
+    style="padding: 12px; width: 90vw; max-width: 600px"
     @close="onCancel"
   >
-    <div class="mb-2">选中总数：{{ localSelectedKeys.length }}</div>
-    <div class="flex items-center justify-between">
-      <div>Tracker 列表一行一个</div>
-      <n-button type="primary" @click="onAddTracker">追加默认tracker</n-button>
+    <div class="mb-2">{{ $t('changeTracker.selectedCount', { count: localSelectedKeys.length }) }}</div>
+    <div class="flex items-center justify-between flex-wrap">
+      <div>{{ $t('changeTracker.trackerList') }}</div>
+      <n-button type="primary" @click="onAddTracker">{{ $t('changeTracker.addDefaultTracker') }}</n-button>
     </div>
-    <n-form label-placement="top">
+    <n-form label-placement="top" :label-width="120" :show-feedback="false">
       <n-form-item>
         <template #label> </template>
         <n-input
           v-model:value="tracker"
-          placeholder="请输入tracker列表，一行一个"
+          :placeholder="$t('changeTracker.trackerPlaceholder')"
           type="textarea"
           :autosize="{ minRows: 5, maxRows: 10 }"
         />
       </n-form-item>
     </n-form>
     <template #action>
-      <n-button @click="onCancel" :loading="loading">取消</n-button>
-      <n-button type="primary" @click="onConfirm" :loading="loading">确定</n-button>
+      <n-button @click="onCancel" :loading="loading">{{ $t('common.cancel') }}</n-button>
+      <n-button type="primary" @click="onConfirm" :loading="loading">{{ $t('common.confirm') }}</n-button>
     </template>
   </n-modal>
 </template>
@@ -33,12 +33,14 @@
 import { useMessage } from 'naive-ui'
 import { useSettingStore, useTorrentStore, useSessionStore } from '@/store'
 import { rpc } from '@/api/rpc'
+import { useI18n } from 'vue-i18n'
 
 const show = defineModel<boolean>('show', { required: true })
 const message = useMessage()
 const torrentStore = useTorrentStore()
 const settingStore = useSettingStore()
 const sessionStore = useSessionStore()
+const { t: $t } = useI18n()
 const loading = ref(false)
 const localSelectedKeys = ref<number[]>([])
 const tracker = ref<string>('')
@@ -66,10 +68,10 @@ async function onConfirm() {
   try {
     await rpc.torrentSet({ ids: localSelectedKeys.value, trackerList: tracker.value || '' })
     show.value = false
-    message.success('tracker修改成功')
+    message.success($t('changeTracker.modifySuccess'))
     await torrentStore.fetchTorrents()
   } catch {
-    message.error('tracker修改失败')
+    message.error($t('changeTracker.modifyFailed'))
   } finally {
     loading.value = false
   }

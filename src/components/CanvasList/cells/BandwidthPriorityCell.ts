@@ -3,7 +3,7 @@ import type { ColumnConfig } from '@/composables/useColumns'
 import { PADDING_X } from '../store/utils'
 import { roundRect } from './utils'
 import { useSettingStore } from '@/store'
-import { PriorityStrings, type PriorityNumberType } from '@/types/tr'
+import { getPriorityString, type PriorityNumberType } from '@/types/tr'
 
 export default function renderBandwidthPriorityCell(
   ctx: CanvasRenderingContext2D,
@@ -14,11 +14,12 @@ export default function renderBandwidthPriorityCell(
   ctx.save()
   const settingStore = useSettingStore()
   const value = row.bandwidthPriority
+  const tagSize = 50
   const { x, y, rowHeight } = state
   const width = col.width - PADDING_X * 2
   const height = Math.min(22, rowHeight - 4)
   const radius = height / 2
-  const xx = x + PADDING_X + (width - 40) / 2
+  const xx = x + PADDING_X + (width - tagSize) / 2
   const yy = y + (rowHeight - height) / 2
   const theme = settingStore.themeVars
 
@@ -31,7 +32,7 @@ export default function renderBandwidthPriorityCell(
     color = theme.errorColor
   }
   ctx.beginPath()
-  roundRect(ctx, xx, yy, 40, height, radius)
+  roundRect(ctx, xx, yy, tagSize, height, radius)
   ctx.fillStyle = `color-mix(in srgb, ${color} 20%, transparent)`
   ctx.fill()
 
@@ -39,6 +40,6 @@ export default function renderBandwidthPriorityCell(
   ctx.textBaseline = 'middle'
   ctx.fillStyle = color
   ctx.font = `12px ${theme.fontFamily}`
-  ctx.fillText(PriorityStrings.get(value as PriorityNumberType) || '', x + PADDING_X + width / 2, y + rowHeight / 2)
+  ctx.fillText(getPriorityString(value as PriorityNumberType) || '', x + PADDING_X + width / 2, y + rowHeight / 2)
   ctx.restore()
 }

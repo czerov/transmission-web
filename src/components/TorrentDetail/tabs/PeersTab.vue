@@ -1,18 +1,21 @@
 <template>
   <div class="py-3 space-y-3 peers-tab" style="min-width: 1024px">
-    <n-card size="small" :bordered="false" title="连接概览" style="width: 400px">
+    <n-card size="small" :bordered="false" :title="t('torrentDetail.peers.connectionOverview')" style="width: 400px">
       <div class="grid grid-cols-2 gap-y-2 gap-x-6 text-sm">
-        <div>正在向我们上传</div>
+        <div>{{ t('torrentDetail.peers.uploadingToUs') }}</div>
         <div>{{ torrent.peersSendingToUs }}</div>
-        <div>正在从我们下载</div>
+        <div>{{ t('torrentDetail.peers.downloadingFromUs') }}</div>
         <div>{{ torrent.peersGettingFromUs }}</div>
       </div>
     </n-card>
 
-    <n-card size="small" :bordered="false" title="Peer 列表">
+    <n-card size="small" :bordered="false" :title="t('torrentDetail.peers.peerList')">
       <div class="text-xs mb-2">
-        来源统计：Tracker {{ torrent.peersFrom?.fromTracker ?? 0 }}，DHT {{ torrent.peersFrom?.fromDht ?? 0 }}，PEX
-        {{ torrent.peersFrom?.fromPex ?? 0 }}，缓存 {{ torrent.peersFrom?.fromCache ?? 0 }}
+        {{ t('torrentDetail.peers.sourceStats') }}：{{ t('torrentDetail.peers.fromTracker') }}
+        {{ torrent.peersFrom?.fromTracker ?? 0 }}，{{ t('torrentDetail.peers.fromDht') }}
+        {{ torrent.peersFrom?.fromDht ?? 0 }}，{{ t('torrentDetail.peers.fromPex') }}
+        {{ torrent.peersFrom?.fromPex ?? 0 }}，{{ t('torrentDetail.peers.fromCache') }}
+        {{ torrent.peersFrom?.fromCache ?? 0 }}
       </div>
       <n-data-table
         :columns="columns"
@@ -32,6 +35,9 @@ import type { DataTableColumns } from 'naive-ui'
 import { formatSpeed } from '@/utils'
 import { h, computed } from 'vue'
 import { NProgress } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps<{ torrent: Torrent }>()
 
@@ -53,24 +59,24 @@ const pagination = {
 // 表格列配置
 const columns: DataTableColumns<Peer & { key: string }> = [
   {
-    title: 'IP',
+    title: t('torrentDetail.peers.ip'),
     key: 'address',
     width: 305
   },
   {
-    title: '端口',
+    title: t('torrentDetail.peers.port'),
     key: 'port',
     width: 70,
     render: (row) => row.port || '-'
   },
   {
-    title: '客户端',
+    title: t('torrentDetail.peers.client'),
     key: 'clientName',
     width: 140,
     render: (row) => row.clientName || '-'
   },
   {
-    title: '进度',
+    title: t('torrentDetail.peers.progress'),
     key: 'progress',
     width: 100,
     render: (row) => {
@@ -86,27 +92,27 @@ const columns: DataTableColumns<Peer & { key: string }> = [
     }
   },
   {
-    title: '上传速度',
+    title: t('torrentDetail.peers.uploadSpeed'),
     key: 'rateToPeer',
     width: 120,
     align: 'right',
     render: (row) => formatSpeed(row.rateToPeer || 0)
   },
   {
-    title: '下载速度',
+    title: t('torrentDetail.peers.downloadSpeed'),
     key: 'rateToClient',
     width: 120,
     align: 'right',
     render: (row) => formatSpeed(row.rateToClient || 0)
   },
   {
-    title: '加密',
+    title: t('torrentDetail.peers.encryption'),
     key: 'encryption',
     width: 60,
     render: (row) => getEncryptionStatus(row.flagStr)
   },
   {
-    title: '状态',
+    title: t('torrentDetail.peers.status'),
     key: 'status',
     width: 60,
     render: (row) => getPeerStatus(row)
@@ -116,11 +122,11 @@ const columns: DataTableColumns<Peer & { key: string }> = [
 // 获取加密状态
 const getEncryptionStatus = (flagStr?: string) => {
   if (!flagStr) {
-    return '否'
+    return t('torrentDetail.peers.no')
   }
   // 检查是否包含加密标志 'E' (Encrypted)
   // E: 表示连接已加密
-  return flagStr.includes('E') ? '是' : '否'
+  return flagStr.includes('E') ? t('torrentDetail.peers.yes') : t('torrentDetail.peers.no')
 }
 
 // Flag meanings: https://github.com/transmission/transmission/blob/main/docs/Peer-Status-Text.md

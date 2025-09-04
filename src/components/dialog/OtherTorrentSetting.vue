@@ -2,21 +2,27 @@
   <n-modal
     v-model:show="show"
     preset="dialog"
-    title="修改限速等限制属性"
+    :title="$t('otherTorrentSetting.title')"
     :close-on-esc="true"
-    class="w-auto! max-w-[600px] min-w-[400px]"
+    style="padding: 12px; width: 90vw; max-width: 600px"
     @close="onCancel"
   >
-    <div class="mb-2">选中总数：{{ torrentStore.selectedKeys.length }}</div>
-    <div class="flex items-center justify-between mb-2 gap-6">
-      <n-checkbox v-model:checked="formData.honorsSessionLimits">使用全局上传限制</n-checkbox>
+    <div class="mb-2">{{ $t('otherTorrentSetting.selectedCount', { count: torrentStore.selectedKeys.length }) }}</div>
+    <div class="item">
+      <n-checkbox v-model:checked="formData.honorsSessionLimits">{{
+        $t('otherTorrentSetting.useGlobalUploadLimit')
+      }}</n-checkbox>
     </div>
-    <div class="flex items-center justify-between mb-2 gap-6" v-if="sessionStore?.rpcVersion >= 18">
-      <n-checkbox v-model:checked="formData.sequential_download">顺序下载</n-checkbox>
+    <div class="item" v-if="sessionStore?.rpcVersion >= 18">
+      <n-checkbox v-model:checked="formData.sequential_download">{{
+        $t('otherTorrentSetting.sequentialDownload')
+      }}</n-checkbox>
     </div>
 
-    <div class="flex items-center justify-between mb-2 gap-6">
-      <n-checkbox v-model:checked="formData.downloadLimited">启用最大下载速度限制</n-checkbox>
+    <div class="item">
+      <n-checkbox v-model:checked="formData.downloadLimited">{{
+        $t('otherTorrentSetting.enableDownloadLimit')
+      }}</n-checkbox>
       <div class="flex items-center gap-1">
         <n-input-number
           v-model:value="formData.downloadLimit"
@@ -27,8 +33,10 @@
       </div>
     </div>
 
-    <div class="flex items-center justify-between mb-2 gap-6">
-      <n-checkbox v-model:checked="formData.uploadLimited">启用最大上传速度限制</n-checkbox>
+    <div class="item">
+      <n-checkbox v-model:checked="formData.uploadLimited">{{
+        $t('otherTorrentSetting.enableUploadLimit')
+      }}</n-checkbox>
       <div class="flex items-center gap-1">
         <n-input-number
           v-model:value="formData.uploadLimit"
@@ -38,14 +46,19 @@
         /><span>KB/s</span>
       </div>
     </div>
-    <div class="flex items-center justify-between mb-2 gap-6">
-      <div>最大连接数</div>
+    <div class="item">
+      <div>{{ $t('otherTorrentSetting.maxConnections') }}</div>
       <n-input-number v-model:value="formData['peer-limit']" :min="0" class="mr-[32px]" />
     </div>
-    <div class="flex items-center justify-between mb-2 gap-6">
-      <div>分享达标自动停止做种</div>
+    <div class="item">
+      <div>{{ $t('otherTorrentSetting.autoStopSeeding') }}</div>
       <div class="flex items-center gap-1">
-        <n-select v-model:value="formData.seedRatioMode" :options="modeOptions" class="w-[90px]" />
+        <n-select
+          v-model:value="formData.seedRatioMode"
+          :options="modeOptions"
+          class="w-[130px]"
+          :consistent-menu-width="false"
+        />
         <n-input-number
           v-model:value="formData.seedRatioLimit"
           class="mr-[32px]"
@@ -53,18 +66,22 @@
         />
       </div>
     </div>
-    <div class="flex items-center justify-between mb-2 gap-6">
-      <div>超时无流量，自动停止做种</div>
+    <div class="item">
+      <div>{{ $t('otherTorrentSetting.autoStopIdle') }}</div>
       <div class="flex items-center gap-1">
-        <n-select v-model:value="formData.seedIdleMode" :options="modeOptions" class="w-[90px]" />
-        <n-input-number v-model:value="formData.seedIdleLimit" :disabled="formData.seedIdleMode !== 1" /><span
-          >分钟</span
-        >
+        <n-select
+          v-model:value="formData.seedIdleMode"
+          :options="modeOptions"
+          class="w-[130px]"
+          :consistent-menu-width="false"
+        />
+        <n-input-number v-model:value="formData.seedIdleLimit" :disabled="formData.seedIdleMode !== 1" />
+        <span class="text-nowrap">{{ $t('common.minutes') }}</span>
       </div>
     </div>
     <template #action>
-      <n-button @click="onCancel" :loading="loading">取消</n-button>
-      <n-button type="primary" @click="onConfirm" :loading="loading">确定</n-button>
+      <n-button @click="onCancel" :loading="loading">{{ $t('common.cancel') }}</n-button>
+      <n-button type="primary" @click="onConfirm" :loading="loading">{{ $t('common.confirm') }}</n-button>
     </template>
   </n-modal>
 </template>
@@ -72,11 +89,13 @@
 import { useMessage } from 'naive-ui'
 import { useTorrentStore, useSessionStore } from '@/store'
 import { rpc } from '@/api/rpc'
+import { useI18n } from 'vue-i18n'
 
 const show = defineModel<boolean>('show', { required: true })
 const message = useMessage()
 const torrentStore = useTorrentStore()
 const sessionStore = useSessionStore()
+const { t: $t } = useI18n()
 const loading = ref(false)
 const props = defineProps<{
   ids?: number[]
@@ -106,11 +125,11 @@ const formData = reactive({
   'peer-limit': 0
 })
 
-const modeOptions = [
-  { label: '全局', value: 0 },
-  { label: '种子', value: 1 },
-  { label: '无限制', value: 2 }
-]
+const modeOptions = computed(() => [
+  { label: $t('otherTorrentSetting.global'), value: 0 },
+  { label: $t('otherTorrentSetting.torrent'), value: 1 },
+  { label: $t('otherTorrentSetting.unlimited'), value: 2 }
+])
 
 watch(show, (v) => {
   if (v) {
@@ -137,10 +156,10 @@ async function onConfirm() {
   try {
     await rpc.torrentSet({ ids, ...formData })
     show.value = false
-    message.success('修改成功')
+    message.success($t('otherTorrentSetting.modifySuccess'))
     await torrentStore.fetchTorrents()
   } catch {
-    message.error('修改失败')
+    message.error($t('otherTorrentSetting.modifyFailed'))
   } finally {
     loading.value = false
   }
@@ -150,7 +169,12 @@ function onCancel() {
 }
 </script>
 <style scoped lang="less">
-.mb-2 {
-  margin-bottom: 0.5rem;
+.item {
+  flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin-bottom: 1rem;
 }
 </style>

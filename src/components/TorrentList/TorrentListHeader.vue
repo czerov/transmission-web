@@ -85,7 +85,7 @@ function getMinWidth(key: any) {
 }
 
 function getTitle(key: string) {
-  return allColumns.find((c) => c.key === key)?.title || key
+  return torrentStore.getColumnTitle(key)
 }
 const resizing = ref(false)
 const resizeColKey = ref<string | null>(null)

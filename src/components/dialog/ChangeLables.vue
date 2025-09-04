@@ -2,18 +2,18 @@
   <n-modal
     v-model:show="show"
     preset="dialog"
-    title="更改标签"
+    :title="$t('changeLabelsDialog.title')"
     :close-on-esc="true"
-    class="w-auto! max-w-[600px]"
     @close="onCancel"
+    style="padding: 12px; width: 90vw; max-width: 600px"
   >
-    <div class="mb-2">选中总数：{{ localSelectedKeys.length }}</div>
-    <n-form label-placement="left" label-width="120">
-      <n-form-item label="标签">
+    <div class="mb-2">{{ $t('changeLabelsDialog.selectedCount', { count: localSelectedKeys.length }) }}</div>
+    <n-form :label-placement="labelType" :label-width="labelType === 'top' ? undefined : 120">
+      <n-form-item :label="$t('changeLabelsDialog.labels')">
         <n-select
           v-model:value="labels"
           :options="labelsOptions"
-          placeholder="请选择或输入标签"
+          :placeholder="$t('changeLabelsDialog.labelsPlaceholder')"
           multiple
           clearable
           filterable
@@ -23,8 +23,8 @@
       </n-form-item>
     </n-form>
     <template #action>
-      <n-button @click="onCancel" :loading="loading">取消</n-button>
-      <n-button type="primary" @click="onConfirm" :loading="loading">确定</n-button>
+      <n-button @click="onCancel" :loading="loading">{{ $t('common.cancel') }}</n-button>
+      <n-button type="primary" @click="onConfirm" :loading="loading">{{ $t('common.confirm') }}</n-button>
     </template>
   </n-modal>
 </template>
@@ -32,10 +32,14 @@
 import { useMessage } from 'naive-ui'
 import { useTorrentStore } from '@/store'
 import { rpc } from '@/api/rpc'
-
+import { useI18n } from 'vue-i18n'
+import { useIsSmallScreen } from '@/composables/useIsSmallScreen'
+const isMobile = useIsSmallScreen()
+const labelType = computed(() => (isMobile.value ? 'top' : 'left'))
 const show = defineModel<boolean>('show', { required: true })
 const message = useMessage()
 const torrentStore = useTorrentStore()
+const { t: $t } = useI18n()
 const loading = ref(false)
 const labels = ref<string[]>([])
 const localSelectedKeys = ref<number[]>([])
@@ -71,10 +75,10 @@ async function onConfirm() {
       labels: labels.value || []
     })
     show.value = false
-    message.success('标签更改成功')
+    message.success($t('changeLabelsDialog.changeSuccess'))
     await torrentStore.fetchTorrents()
   } catch {
-    message.error('标签更改失败')
+    message.error($t('changeLabelsDialog.changeFailed'))
   } finally {
     loading.value = false
   }

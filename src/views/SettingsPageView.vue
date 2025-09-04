@@ -5,7 +5,7 @@
       <n-button quaternary circle @click="onBack" class="flex items-center justify-center">
         <n-icon size="20" :component="ArrowBackIcon" />
       </n-button>
-      <h1 class="text-lg font-medium">参数设置</h1>
+      <h1 class="text-lg font-medium">{{ $t('common.settings') }}</h1>
     </header>
 
     <!-- 内容区域 -->

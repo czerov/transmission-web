@@ -2,22 +2,22 @@
   <n-modal
     v-model:show="show"
     preset="dialog"
-    title="删除种子确认"
+    :title="$t('deleteDialog.title')"
     @close="onCancel"
     :close-on-esc="true"
-    class="w-auto! max-w-[600px]"
+    style="padding: 12px; width: 90vw; max-width: 600px"
   >
-    <div class="mb-2">确认要删除已选择的种子吗？</div>
-    <div class="mb-2">选中总数：{{ selectTorrents.length }}</div>
+    <div class="mb-2">{{ $t('deleteDialog.confirmText') }}</div>
+    <div class="mb-2">{{ $t('deleteDialog.selectedCount', { count: selectTorrents.length }) }}</div>
     <n-el class="max-h-[600px] scrollbar">
-      <div v-for="t in selectTorrents" :key="t.id" class="truncate px-2 mb-1">{{ t.name }}</div>
+      <div v-for="t in selectTorrents" :key="t.id" class="px-2 mb-1">{{ t.name }}</div>
     </n-el>
-    <n-checkbox v-model:checked="deleteData">同时删除数据</n-checkbox>
+    <n-checkbox v-model:checked="deleteData">{{ $t('deleteDialog.deleteData') }}</n-checkbox>
     <br />
-    <n-checkbox v-model:checked="onlyIfNoSeed">没有其他站点保种则删除数据</n-checkbox>
+    <n-checkbox v-model:checked="onlyIfNoSeed">{{ $t('deleteDialog.deleteIfNoSeed') }}</n-checkbox>
     <template #action>
-      <n-button @click="onCancel" :loading="loading">取消</n-button>
-      <n-button type="error" @click="onConfirm" :loading="loading">删除种子</n-button>
+      <n-button @click="onCancel" :loading="loading">{{ $t('common.cancel') }}</n-button>
+      <n-button type="error" @click="onConfirm" :loading="loading">{{ $t('deleteDialog.delete') }}</n-button>
     </template>
   </n-modal>
 </template>
@@ -26,10 +26,11 @@ import { useMessage } from 'naive-ui'
 import { useTorrentStore } from '@/store'
 import { rpc } from '@/api/rpc'
 import { ensurePathDelimiter, fileSystemSafeName, sleep } from '@/utils'
-
+import { useI18n } from 'vue-i18n'
 const show = defineModel<boolean>('show', { required: true })
 const message = useMessage()
 const torrentStore = useTorrentStore()
+const { t: $t } = useI18n()
 const loading = ref(false)
 const deleteData = ref(false)
 const onlyIfNoSeed = ref(false)
@@ -103,19 +104,19 @@ async function onConfirm() {
       res = await rpc.torrentRemove(localSelectedKeys.value, deleteData.value)
     }
     if (!res) {
-      message.error('删除失败')
+      message.error($t('deleteDialog.deleteFailed'))
       return
     }
     if (!props.ids?.length) {
       torrentStore.clearSelectedKeys()
     }
     show.value = false
-    message.success('删除成功')
+    message.success($t('deleteDialog.deleteSuccess'))
     await sleep(1000)
     await torrentStore.fetchTorrents()
   } catch (error) {
     console.error(error)
-    message.error('删除失败')
+    message.error($t('deleteDialog.deleteFailed'))
   } finally {
     loading.value = false
   }

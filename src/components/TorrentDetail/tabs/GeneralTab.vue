@@ -8,131 +8,134 @@
       :processing="torrent.percentDone !== 1"
       indicator-placement="inside"
     />
-    <n-card title="传输信息">
+    <n-card :title="t('torrentDetail.general.transmissionInfo')">
       <div class="torrent-info text-sm">
         <div class="info-item">
-          <span>状态</span>
+          <span>{{ t('torrentDetail.general.status') }}</span>
           <span>{{ statusText }}</span>
         </div>
         <div class="info-item">
-          <span>已下载</span>
+          <span>{{ t('torrentDetail.general.downloaded') }}</span>
           <span>{{ formatSize(torrent.downloadedEver) }}</span>
         </div>
         <div class="info-item">
-          <span>下载速度</span>
+          <span>{{ t('torrentDetail.general.downloadSpeed') }}</span>
           <span>{{ formatSpeed(torrent.rateDownload) }}</span>
         </div>
         <div class="info-item">
-          <span>下载限速</span>
+          <span>{{ t('torrentDetail.general.downloadLimit') }}</span>
           <span>{{ torrent.downloadLimited ? `${formatSpeed((torrent.downloadLimit || 0) * 1024)}` : '-' }}</span>
         </div>
         <div class="info-item">
-          <span>种子|活跃</span>
+          <span>{{ t('torrentDetail.general.seedsActive') }}</span>
           <span>{{ getSeedsInfo() }}</span>
         </div>
         <div class="info-item">
-          <span>Tracker</span>
+          <span>{{ t('torrentDetail.general.tracker') }}</span>
           <span class="truncate" :title="getMainTracker()">{{ getMainTracker() }}</span>
         </div>
 
         <div class="info-item">
-          <span>错误</span>
+          <span>{{ t('torrentDetail.general.error') }}</span>
           <span :title="torrent.errorString">{{ torrent.errorString || '-' }}</span>
         </div>
         <div class="info-item">
-          <span>已上传</span>
+          <span>{{ t('torrentDetail.general.uploaded') }}</span>
           <span>{{ formatSize(torrent.uploadedEver) }}</span>
         </div>
         <div class="info-item">
-          <span>上传速度</span>
+          <span>{{ t('torrentDetail.general.uploadSpeed') }}</span>
           <span>{{ formatSpeed(torrent.rateUpload) }}</span>
         </div>
         <div class="info-item">
-          <span>上传限速</span>
+          <span>{{ t('torrentDetail.general.uploadLimit') }}</span>
           <span>{{ torrent.uploadLimited ? `${formatSpeed((torrent.uploadLimit || 0) * 1024)}` : '-' }}</span>
         </div>
         <div class="info-item">
-          <span>下载|活跃</span>
+          <span>{{ t('torrentDetail.general.peersActive') }}</span>
           <span>{{ getPeersInfo() }}</span>
         </div>
         <div class="info-item">
-          <span>下次汇报时间</span>
+          <span>{{ t('torrentDetail.general.nextAnnounce') }}</span>
           <span>{{ getNextAnnounceTime() }}</span>
         </div>
 
         <div class="info-item">
-          <span>剩余</span>
+          <span>{{ t('torrentDetail.general.remaining') }}</span>
           <span>{{ timeToStr(torrent.eta || 0) }} ({{ formatSize(torrent.leftUntilDone) }})</span>
         </div>
         <div class="info-item">
-          <span>丢弃</span>
+          <span>{{ t('torrentDetail.general.wasted') }}</span>
           <span>{{ getWasted() }}</span>
         </div>
         <div class="info-item">
-          <span>分享率</span>
+          <span>{{ t('torrentDetail.general.shareRatio') }}</span>
           <span>{{ getShareRatio() }}</span>
         </div>
         <div class="info-item">
-          <span>备用带宽</span>
+          <span>{{ t('torrentDetail.general.backupBandwidth') }}</span>
           <span>{{ torrent.group || '-' }}</span>
         </div>
         <div class="info-item">
-          <span>最大链接数</span>
+          <span>{{ t('torrentDetail.general.maxConnections') }}</span>
           <span>{{ torrent.maxConnectedPeers }}</span>
         </div>
         <div class="info-item">
-          <span>最后活动时间</span>
+          <span>{{ t('torrentDetail.general.lastActivity') }}</span>
           <span>{{ formatDate(torrent.activityDate) }}</span>
         </div>
       </div>
     </n-card>
 
     <!-- 种子信息 -->
-    <n-card title="种子信息">
+    <n-card :title="t('torrentDetail.general.torrentInfo')">
       <div class="text-sm torrent-info">
         <div>
           <div class="info-item">
-            <span>保存目录</span>
+            <span>{{ t('torrentDetail.general.saveDirectory') }}</span>
             <span class="truncate text-left" :title="torrent.downloadDir">{{ torrent.downloadDir }}</span>
           </div>
           <div class="info-item">
-            <span>总大小</span>
-            <span>{{ formatSize(torrent.totalSize) }} (已下载 {{ formatSize(torrent.downloadedEver) }})</span>
+            <span>{{ t('torrentDetail.general.totalSize') }}</span>
+            <span
+              >{{ formatSize(torrent.totalSize) }} ({{ t('torrentDetail.general.completed') }}
+              {{ formatSize(torrent.downloadedEver) }})</span
+            >
           </div>
           <div class="info-item">
-            <span>Hash</span>
+            <span>{{ t('torrentDetail.general.hash') }}</span>
             <span :title="torrent.hashString">{{ torrent.hashString || '-' }}</span>
           </div>
           <div class="info-item">
-            <span>添加时间</span>
+            <span>{{ t('torrentDetail.general.addTime') }}</span>
             <span>{{ formatDate(torrent.addedDate) }}</span>
           </div>
           <div class="info-item">
-            <span>磁力链接</span>
+            <span>{{ t('torrentDetail.general.magnetLink') }}</span>
             <span :title="torrent.magnetLink">{{ torrent.magnetLink || '-' }}</span>
           </div>
         </div>
         <div>
           <div class="info-item">
-            <span>创建日期</span>
+            <span>{{ t('torrentDetail.general.createDate') }}</span>
             <span v-if="torrent.dateCreated">{{ formatDate(torrent.dateCreated) }}</span>
             <span v-else-if="torrent.creator">{{ ` by ${torrent.creator as string}` }}</span>
             <span v-else>-</span>
           </div>
           <div class="info-item">
-            <span>块</span>
+            <span>{{ t('torrentDetail.general.blocks') }}</span>
             <span>{{ getBlocksInfo() }}</span>
           </div>
           <div class="info-item">
-            <span>注释</span>
+            <span>{{ t('torrentDetail.general.comment') }}</span>
             <span class="truncate" :title="torrent.comment">{{ torrent.comment || '-' }}</span>
           </div>
           <div class="info-item">
-            <span>完成时间</span>
+            <span>{{ t('torrentDetail.general.completeTime') }}</span>
             <span>{{ formatDate(torrent.doneDate) }}</span>
           </div>
           <div class="info-item">
-            <span>用户标签</span>
+            <span>{{ t('torrentDetail.general.userLabels') }}</span>
             <div class="flex gap-1 flex-1">
               <n-tag v-for="label in torrent.labels" :key="label" size="small" type="primary">
                 {{ label }}
@@ -150,12 +153,15 @@
 import { computed } from 'vue'
 import type { Torrent } from '@/api/rpc'
 import { formatSpeed, formatSize, timeToStr } from '@/utils'
-import { StatusStrings } from '@/types/tr'
+import { getStatusString } from '@/types/tr'
 import dayjs from 'dayjs'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps<{ torrent: Torrent }>()
 
-const statusText = computed(() => StatusStrings[props.torrent.status] || '-')
+const statusText = computed(() => getStatusString(props.torrent.status) || '-')
 
 function formatDate(ts?: number) {
   if (!ts) {
@@ -228,7 +234,7 @@ function getBlocksInfo() {
 
 function getWasted() {
   const hashfails = props.torrent.pieceSize! > 0 ? props.torrent.corruptEver! / props.torrent.pieceSize! || 0 : 0
-  return `${formatSize(props.torrent.corruptEver!)} (${hashfails} 异常)`
+  return `${formatSize(props.torrent.corruptEver!)} (${hashfails} ${t('torrentDetail.general.abnormal')})`
 }
 </script>
 

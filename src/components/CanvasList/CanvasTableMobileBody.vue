@@ -249,7 +249,7 @@ function isMenuButtonClicked(e: MouseEvent, rowIndex: number): boolean {
   const clickX = e.clientX
   const clickY = e.clientY
   const react = bodyWrapper.value?.getBoundingClientRect()
-  console.debug('isMenuButtonClicked', react?.top)
+  // console.debug('isMenuButtonClicked', react?.top)
   // 计算NameCell的位置和尺寸
   const heights = cardStore.cumulativeHeights.heights
   const mapRowHeights = cardStore.cumulativeHeights.mapRowHeights

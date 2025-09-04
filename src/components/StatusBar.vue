@@ -9,7 +9,7 @@
         circle
         size="small"
         @click="onToggleTheme"
-        title="切换主题"
+        :title="$t('statusBar.toggleTheme')"
         class="flex items-center justify-center"
       >
         <template #icon>
@@ -21,7 +21,7 @@
         circle
         size="small"
         @click="onShowAbout"
-        title="关于"
+        :title="$t('statusBar.about')"
         class="flex items-center justify-center"
       >
         <template #icon>
@@ -36,6 +36,7 @@
 import { useSessionStore, useSettingStore, useTorrentStore } from '@/store'
 import { formatSize, formatSpeed } from '@/utils'
 import { InformationCircle as InfoIcon, Moon as MoonIcon, Sunny as SunIcon } from '@vicons/ionicons5'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   class?: string
@@ -44,6 +45,7 @@ const props = defineProps<{
 const sessionStore = useSessionStore()
 const torrentStore = useTorrentStore()
 const settingStore = useSettingStore()
+const { t: $t } = useI18n()
 
 const session = computed(() => sessionStore.session)
 const torrents = computed(() => torrentStore.torrents)
@@ -114,18 +116,26 @@ function onShowAbout() {
 
 // tag 数据
 const allTags = computed(() => [
-  { text: `TR版本: ${session.value?.['version'] ?? '--'}`, type: 'info' as const },
-  { text: `服务器: ${serverHost.value}`, type: 'info' as const },
+  { text: $t('statusBar.version', { version: session.value?.['version'] ?? '--' }), type: 'info' as const },
+  { text: $t('statusBar.server', { server: serverHost.value }), type: 'info' as const },
   {
-    text: `↑ 上传: ${formatSpeed(computedFields.value.upRate)} (${formatSpeed(limit.value.upRateLimit * 1024)})`,
+    text: $t('statusBar.upload', {
+      rate: formatSpeed(computedFields.value.upRate),
+      limit: formatSpeed(limit.value.upRateLimit * 1024)
+    }),
     type: 'success' as const
   },
   {
-    text: `↓ 下载: ${formatSpeed(computedFields.value.downRate)} (${formatSpeed(limit.value.downRateLimit * 1024)})`,
+    text: $t('statusBar.download', {
+      rate: formatSpeed(computedFields.value.downRate),
+      limit: formatSpeed(limit.value.downRateLimit * 1024)
+    }),
     type: 'info' as const
   },
-  { text: `文件总大小: ${formatSize(totalSize.value)}`, type: 'info' as const },
-  ...(selectedSize.value > 0 ? [{ text: `选中大小: ${formatSize(selectedSize.value)}`, type: 'info' as const }] : [])
+  { text: $t('statusBar.totalSize', { size: formatSize(totalSize.value) }), type: 'info' as const },
+  ...(selectedSize.value > 0
+    ? [{ text: $t('statusBar.selectedSize', { size: formatSize(selectedSize.value) }), type: 'info' as const }]
+    : [])
 ])
 </script>
 

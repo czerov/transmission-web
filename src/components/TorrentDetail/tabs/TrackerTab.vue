@@ -1,6 +1,8 @@
 <template>
   <div style="min-width: 740px" class="tracker-tab">
-    <n-button @click="handleChangeTracker" size="small" class="mb-2">修改 Tracker</n-button>
+    <n-button @click="handleChangeTracker" size="small" class="mb-2">{{
+      t('torrentDetail.tracker.modifyTracker')
+    }}</n-button>
     <n-data-table
       :columns="columns"
       :data="torrent.trackerStats || []"
@@ -15,31 +17,18 @@
 
 <script setup lang="ts">
 import type { Torrent, TrackerStat } from '@/api/rpc'
+import { getTrackerAnnounceState } from '@/store/torrentUtils'
 import { timeToStr } from '@/utils'
 import type { DataTableColumns } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 defineProps<{ torrent: Torrent }>()
 const showChangeTrackerDialog = ref(false)
 
 function handleChangeTracker() {
   showChangeTrackerDialog.value = true
-}
-
-// 格式化状态
-function formatStatus(tracker: TrackerStat): string {
-  if (tracker.announceState === 3) {
-    return '工作(上传中)'
-  }
-  if (tracker.hasAnnounced as boolean) {
-    if (tracker.lastAnnounceSucceeded as boolean) {
-      return '工作'
-    }
-    if (tracker.lastAnnounceResult === 'Success') {
-      return '工作'
-    }
-    return tracker.lastAnnounceResult
-  }
-  return '未知'
 }
 
 // 格式化下次汇报时间
@@ -62,7 +51,7 @@ function formatNextAnnounce(row: TrackerStat): string {
 // 表格列配置
 const columns: DataTableColumns<TrackerStat> = [
   {
-    title: 'URL',
+    title: t('torrentDetail.tracker.url'),
     key: 'announce',
     width: 300,
     ellipsis: {
@@ -70,33 +59,33 @@ const columns: DataTableColumns<TrackerStat> = [
     }
   },
   {
-    title: '状态',
+    title: t('torrentDetail.tracker.status'),
     key: 'status',
     width: 80,
-    render: (row) => formatStatus(row)
+    render: (row) => getTrackerAnnounceState(row)
   },
   {
-    title: '下次汇报',
+    title: t('torrentDetail.tracker.nextAnnounce'),
     key: 'nextAnnounceTime',
     width: 120,
     render: (row) => formatNextAnnounce(row)
   },
   {
-    title: '做种数',
+    title: t('torrentDetail.tracker.seederCount'),
     key: 'seederCount',
     width: 80,
     align: 'right',
     render: (row) => row.seederCount?.toString() || '0'
   },
   {
-    title: '用户数',
+    title: t('torrentDetail.tracker.leecherCount'),
     key: 'leecherCount',
     width: 80,
     align: 'right',
     render: (row) => row.leecherCount?.toString() || '0'
   },
   {
-    title: '下载数',
+    title: t('torrentDetail.tracker.downloadCount'),
     key: 'downloadCount',
     width: 80,
     align: 'right',

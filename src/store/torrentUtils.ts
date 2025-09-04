@@ -2,6 +2,8 @@ import type { Torrent, TrackerStat } from '@/api/rpc'
 import { statusFilterFunMap, statusFilters } from '@/const/status'
 import { Status } from '@/types/tr'
 import { ShuffleOutline } from '@vicons/ionicons5'
+import i18n from '@/i18n'
+import { isFunction } from 'lodash-es'
 
 export interface IMenuItem {
   icon?: Component
@@ -19,6 +21,7 @@ export const detailFilterOptions = function (
   downloadDirSet: Map<string, IMenuItem>,
   statusSet: Map<string, IMenuItem>
 ) {
+  const $t = i18n.global.t
   // === 1. 统计各种选项（用于生成过滤选项） ===
   // labels 统计
   if (Array.isArray(t.labels) && t.labels.length > 0) {
@@ -28,7 +31,7 @@ export const detailFilterOptions = function (
     })
   } else {
     const prev = labelsSet.get('noLabels')
-    labelsSet.set('noLabels', { count: (prev?.count || 0) + 1, label: '无标签' })
+    labelsSet.set('noLabels', { count: (prev?.count || 0) + 1, label: $t('common.noLabels') })
   }
 
   // tracker 统计
@@ -44,7 +47,7 @@ export const detailFilterOptions = function (
     })
   } else {
     const prev = trackerSet.get('noTracker')
-    trackerSet.set('noTracker', { count: (prev?.count || 0) + 1, label: '没有Tracker' })
+    trackerSet.set('noTracker', { count: (prev?.count || 0) + 1, label: $t('common.noTracker') })
   }
 
   // error 统计
@@ -61,36 +64,41 @@ export const detailFilterOptions = function (
 
   // status 统计
   statusFilters.forEach((filter) => {
-    const prev = statusSet.get(filter.name)
+    const prev = statusSet.get(filter.key)
     let count = prev?.count || 0
     if (filter.filter(t)) {
       count++
     }
-    statusSet.set(filter.name, {
+    statusSet.set(filter.key, {
       icon: filter.icon,
       color: filter.color,
+      label: filter.label($t),
       count: count
     })
   })
 }
 
 // 将 map 转换成数组
-export const mapToOptions = (map: Map<string, IMenuItem>, total: number) => [
-  { key: 'all', label: `全部（${total}）`, icon: ShuffleOutline },
-  ...Array.from(map.entries()).map(([item, value]) => {
-    return {
-      key: item,
-      label: `${value.label || item}（${value.count}）`,
-      color: value?.color,
-      icon: value?.icon
-    } as {
-      key: string
-      label: string
-      color?: string
-      icon?: Component
-    }
-  })
-]
+export const mapToOptions = (map: Map<string, IMenuItem>, total: number) => {
+  const $t = i18n.global.t
+  return [
+    { key: 'all', label: `${$t('common.all', { total })}`, icon: ShuffleOutline },
+    ...Array.from(map.entries()).map(([item, value]) => {
+      const label = isFunction(value.label) ? value.label($t) : value.label
+      return {
+        key: item,
+        label: `${label || item}（${value.count}）`,
+        color: value?.color,
+        icon: value?.icon
+      } as {
+        key: string
+        label: string
+        color?: string
+        icon?: Component
+      }
+    })
+  ]
+}
 
 // 是否可以过滤这个种子
 export const isFilterTorrents = function (
@@ -234,15 +242,16 @@ export const getTorrentError = (t: Torrent): string => {
 
 // 获取 tracker 状态
 export const getTrackerAnnounceState = (tracker: TrackerStat) => {
+  const $t = i18n.global.t
   if (tracker.announceState === 3) {
-    return '工作(上传中)'
+    return $t('statusFilter.working') + '(' + $t('status.uploading') + ')'
   }
   if (tracker.hasAnnounced) {
     if (tracker.lastAnnounceSucceeded) {
-      return '工作'
+      return $t('statusFilter.working')
     }
     if (tracker.lastAnnounceResult === 'Success') {
-      return '工作'
+      return $t('statusFilter.working')
     }
     return tracker.lastAnnounceResult
   }

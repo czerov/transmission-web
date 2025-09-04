@@ -10,11 +10,13 @@
 import DismissSquareIcon from '@/assets/icons/dismissSquare.svg?component'
 import { useTorrentStore } from '@/store'
 import { renderIcon } from '@/utils'
+import { useI18n } from 'vue-i18n'
 const torrentStore = useTorrentStore()
+const { t: $t } = useI18n()
 const errorMenuOptions = computed(() => {
   return [
     {
-      label: '错误分布',
+      label: $t('sidebar.error'),
       key: 'error',
       icon: renderIcon(DismissSquareIcon, 'var(--error-color)'),
       children: torrentStore.errorStringOptions.map((item) => ({

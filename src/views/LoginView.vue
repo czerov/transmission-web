@@ -1,44 +1,51 @@
 <template>
   <div class="flex items-center justify-center min-h-screen">
     <n-card class="w-[420px] rounded-lg shadow-lg login-card">
-      <h2 class="text-xl font-bold mb-6 text-center">Transmission 登录</h2>
+      <h2 class="text-xl font-bold mb-6 text-center">{{ $t('login.title') }}</h2>
       <n-form
         ref="formRef"
         :model="loginForm"
         :rules="rules"
         size="large"
         label-placement="left"
-        label-width="auto"
         :show-feedback="false"
+        :show-label="false"
       >
         <n-space vertical size="large">
-          <n-form-item path="domain" label="域名">
-            <n-input v-model:value="loginForm.domain" placeholder="https://example.com:9091" clearable />
+          <n-form-item path="domain" :label="$t('login.domain')">
+            <n-input v-model:value="loginForm.domain" :placeholder="$t('login.domainPlaceholder')" clearable />
           </n-form-item>
 
-          <n-form-item path="username" label="用户名">
-            <n-input v-model:value="loginForm.username" placeholder="请输入用户名" clearable />
+          <n-form-item path="username" :label="$t('login.username')">
+            <n-input v-model:value="loginForm.username" :placeholder="$t('login.usernamePlaceholder')" clearable />
           </n-form-item>
 
-          <n-form-item path="password" label="密码">
+          <n-form-item path="password" :label="$t('login.password')">
             <n-input
               v-model:value="loginForm.password"
               type="password"
-              placeholder="请输入密码"
+              :placeholder="$t('login.passwordPlaceholder')"
               show-password-on="click"
               @keyup.enter="onLogin"
             />
           </n-form-item>
 
           <n-form-item>
-            <n-checkbox v-model:checked="loginForm.rememberPassword">记住密码</n-checkbox>
+            <n-checkbox v-model:checked="loginForm.rememberPassword">{{ $t('login.rememberPassword') }}</n-checkbox>
           </n-form-item>
 
           <n-form-item>
-            <n-button type="primary" size="large" block @click="onLogin" :loading="loading"> 登录 </n-button>
+            <n-button type="primary" size="large" block @click="onLogin" :loading="loading">{{
+              $t('login.loginButton')
+            }}</n-button>
           </n-form-item>
         </n-space>
       </n-form>
+
+      <!-- 语言切换器 -->
+      <div class="switcher-container">
+        <LanguageSwitcher />
+      </div>
     </n-card>
   </div>
 </template>
@@ -48,8 +55,11 @@ import { rpc } from '@/api/rpc'
 import { useSessionStore, useSettingStore } from '@/store'
 import type { FormInst, FormRules } from 'naive-ui'
 import { useMessage } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 const settingStore = useSettingStore()
 const sessionStore = useSessionStore()
+const { t: $t } = useI18n()
 
 interface LoginForm {
   domain: string
@@ -120,7 +130,7 @@ const onLogin = async () => {
     settingStore.setAuth(loginForm.value.username, loginForm.value.password)
 
     await rpc.sessionGet() // 能获取到说明登录成功
-    message.success('登录成功')
+    message.success($t('login.loginSuccess'))
     router.push('/')
   } catch (validationErrors) {
     // 如果是表单验证错误，不需要特殊处理，naive-ui 会自动显示错误信息
@@ -130,9 +140,9 @@ const onLogin = async () => {
     // 处理登录接口错误
     const e = validationErrors as any
     if (e.response && (e.response.status === 401 || e.response.status === 403)) {
-      message.error('用户名或密码错误')
+      message.error($t('login.invalidCredentials'))
     } else {
-      message.error('登录失败，请检查服务端或网络')
+      message.error($t('login.loginFailed'))
     }
   } finally {
     loading.value = false
@@ -154,5 +164,10 @@ onMounted(() => {
   -webkit-backdrop-filter: blur(10px) brightness(95%);
   backdrop-filter: blur(10px) brightness(95%);
   background-color: color-mix(in srgb, var(--n-color) 50%, transparent 80%);
+  .switcher-container {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+  }
 }
 </style>

@@ -11,8 +11,15 @@ import AutoImport from 'unplugin-auto-import/vite'
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
   const base = env.VITE_BASE_URL || ''
+
+  // 读取 package.json 中的版本号
+  const packageJson = JSON.parse(require('fs').readFileSync('./package.json', 'utf8'))
+
   return {
     base: base,
+    define: {
+      __APP_VERSION__: JSON.stringify(packageJson.version)
+    },
     build: {
       outDir: 'dist',
       rollupOptions: {

@@ -2,12 +2,12 @@
   <div class="files-tab" style="min-width: 1024px">
     <div class="title">
       <n-text class="text-xs">
-        文件总数: {{ totalFiles }} | 选中下载: {{ selectedFiles }} | 总大小: {{ formatSize(totalSize) }}
+        {{ t('torrentDetail.files.fileCount') }}: {{ totalFiles }} | {{ t('torrentDetail.files.selectedDownload') }}: {{ selectedFiles }} | {{ t('torrentDetail.files.totalSize') }}: {{ formatSize(totalSize) }}
       </n-text>
       <div class="flex gap-2">
-        <n-button size="small" @click="selectAll">全选</n-button>
+        <n-button size="small" @click="selectAll">{{ t('torrentDetail.files.selectAll') }}</n-button>
         <n-dropdown :options="priorityOptions" @select="handleBatchPriority" placement="bottom-end">
-          <n-button size="small">批量设置优先级</n-button>
+          <n-button size="small">{{ t('torrentDetail.files.batchSetPriority') }}</n-button>
         </n-dropdown>
       </div>
     </div>
@@ -40,13 +40,16 @@
 import type { Torrent } from '@/api/rpc'
 import { rpc } from '@/api/rpc'
 import { formatSize } from '@/utils'
-import { PriorityStrings, type PriorityNumberType } from '@/types/tr'
+import { getPriorityString, type PriorityNumberType } from '@/types/tr'
 import type { TreeOption } from 'naive-ui'
 import { h, computed, ref, watch } from 'vue'
 import { NProgress, NTag, NDropdown, NButton, useMessage, NText, NTree } from 'naive-ui'
 import { FolderOutline, DocumentOutline } from '@vicons/ionicons5'
 import { priorityOptions, priorityTagColorConfig } from '@/components/AppHeader/priority'
 import { useTorrentStore } from '@/store'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 interface FileTreeNode extends TreeOption {
   key: string
@@ -248,7 +251,7 @@ const renderSuffix = (props: any) => {
                 bordered: false,
                 style: { cursor: 'pointer', minWidth: '48px', justifyContent: 'center' }
               },
-              () => PriorityStrings.get(option.priority as PriorityNumberType) || '正常'
+              () => getPriorityString(option.priority as PriorityNumberType) || t('torrentDetail.files.normal')
             )
         )
       : null
@@ -277,10 +280,10 @@ const onCheckedKeysChange = async (keys: string[]) => {
       'files-wanted': wantedIndices,
       'files-unwanted': unwantedIndices
     })
-    message.success('文件选择已更新')
+    message.success(t('torrentDetail.files.fileSelectionUpdated'))
   } catch (error) {
     console.error('更新文件选择失败:', error)
-    message.error('更新文件选择失败')
+    message.error(t('torrentDetail.files.updateFileSelectionFailed'))
   }
 }
 
@@ -297,10 +300,10 @@ const selectAll = async () => {
       'files-wanted': wantedIndices,
       'files-unwanted': []
     })
-    message.success('已全选所有文件')
+    message.success(t('torrentDetail.files.allFilesSelected'))
   } catch (error) {
     console.error('全选失败:', error)
-    message.error('全选失败')
+    message.error(t('torrentDetail.files.selectAllFailed'))
   }
 }
 
@@ -315,7 +318,7 @@ const handleBatchPriority = async (priority: number) => {
   })
 
   if (selectedIndices.length === 0) {
-    message.warning('请先选择要设置优先级的文件')
+    message.warning(t('torrentDetail.files.pleaseSelectFiles'))
     return
   }
 
@@ -336,11 +339,11 @@ const handleBatchPriority = async (priority: number) => {
     })
     torrentStore.fetchDetails()
     message.success(
-      `已设置 ${selectedIndices.length} 个文件的优先级为 ${PriorityStrings.get(priority as PriorityNumberType)}`
+      t('torrentDetail.files.prioritySet', { count: selectedIndices.length, priority: getPriorityString(priority as PriorityNumberType) })
     )
   } catch (error) {
     console.error('设置优先级失败:', error)
-    message.error('设置优先级失败')
+    message.error(t('torrentDetail.files.setPriorityFailed'))
   }
 }
 
@@ -363,10 +366,10 @@ const handleFilePriority = async (fileIndex: number, priority: number) => {
     })
     torrentStore.fetchDetails()
 
-    message.success(`已设置文件优先级为 ${PriorityStrings.get(priority as PriorityNumberType)}`)
+    message.success(t('torrentDetail.files.filePrioritySet', { priority: getPriorityString(priority as PriorityNumberType) }))
   } catch (error) {
     console.error('设置文件优先级失败:', error)
-    message.error('设置文件优先级失败')
+    message.error(t('torrentDetail.files.setFilePriorityFailed'))
   }
 }
 </script>

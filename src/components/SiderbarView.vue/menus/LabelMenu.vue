@@ -10,12 +10,14 @@
 import { useTorrentStore } from '@/store'
 import { renderIcon } from '@/utils'
 import { Pricetag, Pricetags } from '@vicons/ionicons5'
+import { useI18n } from 'vue-i18n'
 
 const torrentStore = useTorrentStore()
+const { t: $t } = useI18n()
 const labelMenuOptions = computed(() => {
   return [
     {
-      label: '用户标签',
+      label: $t('sidebar.labels'),
       key: 'labels',
       icon: renderIcon(Pricetags),
       children: torrentStore.labelsOptions.map((item) => ({

@@ -11,12 +11,14 @@ import MagnetIcon from '@/assets/icons/magnet.svg?component'
 import { useTorrentStore } from '@/store'
 import { renderIcon } from '@/utils'
 import { ShuffleOutline } from '@vicons/ionicons5'
+import { useI18n } from 'vue-i18n'
 
 const torrentStore = useTorrentStore()
+const { t: $t } = useI18n()
 const statusMenuOptions = computed(() => {
   return [
     {
-      label: '种子状态',
+      label: $t('sidebar.status'),
       key: 'status',
       icon: renderIcon(MagnetIcon),
       children: torrentStore.statusOptions.map((item) => ({

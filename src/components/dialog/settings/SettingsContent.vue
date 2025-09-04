@@ -7,35 +7,35 @@
       type="line"
       placement="top"
       :animated="true"
-      class="flex-1 pb-2"
+      class="flex-1 pb-2 tabs"
       :class="props.tabWrapperClass"
     >
-      <n-tab-pane name="polling" tab="轮询设置">
+      <n-tab-pane name="polling" :tab="$t('settings.polling')">
         <div>
           <PollingSettings v-model:form="pollingForm" />
         </div>
       </n-tab-pane>
-      <n-tab-pane name="download" tab="下载设置">
+      <n-tab-pane name="download" :tab="$t('settings.download')">
         <div>
           <DownloadSettings v-model:form="sessionForm" />
         </div>
       </n-tab-pane>
-      <n-tab-pane name="network" tab="网络设置">
+      <n-tab-pane name="network" :tab="$t('settings.network')">
         <div>
           <NetworkSettings v-model:form="sessionForm" />
         </div>
       </n-tab-pane>
-      <n-tab-pane name="bandwidth" tab="带宽设置">
+      <n-tab-pane name="bandwidth" :tab="$t('settings.bandwidth')">
         <div>
           <BandwidthSettings v-model:form="sessionForm" />
         </div>
       </n-tab-pane>
-      <n-tab-pane name="queue" tab="队列设置">
+      <n-tab-pane name="queue" :tab="$t('settings.queue')">
         <div>
           <QueueSettings v-model:form="sessionForm" />
         </div>
       </n-tab-pane>
-      <n-tab-pane name="other" tab="其他设置">
+      <n-tab-pane name="other" :tab="$t('settings.other')">
         <div>
           <OtherSettings v-model:form="sessionForm" />
         </div>
@@ -43,8 +43,8 @@
     </n-tabs>
     <!-- 吸底保存按钮 -->
     <div class="settings-footer">
-      <n-button v-if="isDialog" @click="onCancel" :loading="loading" size="large">取消</n-button>
-      <n-button type="primary" @click="onSave" :loading="loading" size="large">保存</n-button>
+      <n-button v-if="isDialog" @click="onCancel" :loading="loading" size="large">{{ $t('common.cancel') }}</n-button>
+      <n-button type="primary" @click="onSave" :loading="loading" size="large">{{ $t('common.save') }}</n-button>
     </div>
   </n-el>
 </template>
@@ -55,7 +55,9 @@ import { useSettingStore } from '@/store/setting'
 import { useMessage } from 'naive-ui'
 import { useSessionStore } from '@/store'
 import { omit } from 'lodash-es'
+import { useI18n } from 'vue-i18n'
 const sessionStore = useSessionStore()
+const { t: $t } = useI18n()
 
 interface Props {
   // 是否是弹窗模式
@@ -189,10 +191,10 @@ async function onSave() {
     }
     settingStore.setting.singleLine = !!sessionForm.value['single-line']
     await rpc.sessionSet(omit(sessionForm.value, ['single-line']))
-    message.success('保存成功')
+    message.success($t('settings.saveSuccess'))
     emit('save-success')
   } catch {
-    message.error('保存失败')
+    message.error($t('settings.saveFailed'))
   } finally {
     loading.value = false
   }
@@ -205,6 +207,11 @@ function onCancel() {
 </script>
 
 <style scoped lang="less">
+.tabs {
+  :deep(.n-tabs-nav) {
+    padding-inline: 12px !important;
+  }
+}
 .settings-content {
   display: flex;
   flex-direction: column;

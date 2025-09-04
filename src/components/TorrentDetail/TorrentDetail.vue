@@ -8,24 +8,26 @@
         <template v-if="selectedCount === 1 && torrent">
           {{ torrent.name }}
         </template>
-        <template v-else-if="selectedCount > 1"> 已选择 {{ selectedCount }} 项 </template>
-        <template v-else> 未选择任何任务 </template>
+        <template v-else-if="selectedCount > 1">{{
+          $t('torrentDetail.selectedItems', { count: selectedCount })
+        }}</template>
+        <template v-else>{{ $t('torrentDetail.noSelection') }}</template>
       </div>
       <div class="flex items-center gap-2 pr-1">
         <IconButton v-if="closable" :icon="CloseIcon" @click="onClose" />
       </div>
     </div>
     <n-tabs v-model:value="currentTab" type="line" :animated="true" class="detail-tabs">
-      <n-tab-pane name="general" tab="常规" class="tab-pane">
+      <n-tab-pane name="general" :tab="$t('torrentDetail.general.general')" class="tab-pane">
         <GeneralTab v-if="torrent" :torrent="torrent" />
       </n-tab-pane>
-      <n-tab-pane name="files" tab="内容" class="tab-pane">
+      <n-tab-pane name="files" :tab="$t('torrentDetail.files.files')" class="tab-pane">
         <FilesTab v-if="torrent" :torrent="torrent" />
       </n-tab-pane>
-      <n-tab-pane name="peers" tab="用户" class="tab-pane">
+      <n-tab-pane name="peers" :tab="$t('torrentDetail.peers.peers')" class="tab-pane">
         <PeersTab v-if="torrent" :torrent="torrent" />
       </n-tab-pane>
-      <n-tab-pane name="tracker" tab="Tracker" class="tab-pane">
+      <n-tab-pane name="tracker" :tab="$t('torrentDetail.tracker.tracker')" class="tab-pane">
         <TrackerTab v-if="torrent" :torrent="torrent" />
       </n-tab-pane>
     </n-tabs>
@@ -36,6 +38,7 @@
 import type { Torrent } from '@/api/rpc'
 import { useTorrentStore } from '@/store'
 import { CloseCircleOutline as CloseIcon } from '@vicons/ionicons5'
+import { useI18n } from 'vue-i18n'
 
 interface Props {
   // 用于 PC 场景的固定高度（px），移动端抽屉中可忽略
@@ -56,6 +59,7 @@ const emit = defineEmits<{
   close: []
 }>()
 
+const { t: $t } = useI18n()
 const torrentStore = useTorrentStore()
 const selectedCount = computed(() => torrentStore.selectedKeys.length)
 const torrent = computed<Torrent | undefined>(() => {

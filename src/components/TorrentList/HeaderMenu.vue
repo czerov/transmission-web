@@ -40,7 +40,6 @@ import draggable from 'vuedraggable'
 import { useTorrentStore } from '@/store'
 import DragIcon from '@/assets/icons/drag.svg?component'
 import { isSupportTouch } from '@/utils/evt'
-import { allColumns } from '@/composables/useColumns'
 
 const props = defineProps<{
   show: boolean
@@ -50,6 +49,7 @@ const props = defineProps<{
 const emit = defineEmits(['update:show'])
 
 const torrentStore = useTorrentStore()
+const { getColumnTitle } = torrentStore
 const columns = computed(() => torrentStore.columns)
 const checked = computed(() => columns.value.filter((c) => c.visible).map((c) => c.key))
 function isChecked(key: string) {
@@ -65,7 +65,7 @@ function onDragEnd(newList: { key: string; width: number; visible: boolean }[]) 
   torrentStore.setVisibleColumns(newList)
 }
 function getTitle(key: string) {
-  return allColumns.find((c) => c.key === key)?.title || key
+  return getColumnTitle(key)
 }
 const close = (e: Event) => {
   const target = e.target as HTMLElement

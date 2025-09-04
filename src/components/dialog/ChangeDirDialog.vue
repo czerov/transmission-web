@@ -2,29 +2,29 @@
   <n-modal
     v-model:show="show"
     preset="dialog"
-    title="更改下载目录"
+    :title="$t('changeDirDialog.title')"
     :close-on-esc="true"
-    class="w-auto! max-w-[600px]"
     @close="onCancel"
+    style="padding: 12px; width: 90vw; max-width: 600px"
   >
-    <div class="mb-2">选中总数：{{ localSelectedKeys.length }}</div>
-    <n-form label-placement="left" label-width="120">
-      <n-form-item label="新目录">
+    <div class="mb-2">{{ $t('changeDirDialog.selectedCount', { count: localSelectedKeys.length }) }}</div>
+    <n-form :label-placement="labelType" :label-width="labelType === 'top' ? undefined : 120" :show-feedback="false">
+      <n-form-item :label="$t('changeDirDialog.newDir')">
         <n-auto-complete
           v-model:value="dir"
           :options="downloadDirOptions"
-          placeholder="请输入新目录"
+          :placeholder="$t('changeDirDialog.newDirPlaceholder')"
           clearable
           :get-show="() => true"
         />
       </n-form-item>
       <n-form-item>
-        <n-checkbox v-model:checked="moveData"> 同时移动数据（如不勾选，则从新目录下查找文件） </n-checkbox>
+        <n-checkbox v-model:checked="moveData">{{ $t('changeDirDialog.moveData') }}</n-checkbox>
       </n-form-item>
     </n-form>
     <template #action>
-      <n-button @click="onCancel" :loading="loading">取消</n-button>
-      <n-button type="primary" @click="onConfirm" :loading="loading" :disabled="!dir.trim()">确定</n-button>
+      <n-button @click="onCancel" :loading="loading">{{ $t('common.cancel') }}</n-button>
+      <n-button type="primary" @click="onConfirm" :loading="loading"> {{ $t('common.confirm') }} </n-button>
     </template>
   </n-modal>
 </template>
@@ -32,11 +32,15 @@
 import { useMessage } from 'naive-ui'
 import { useTorrentStore, useSessionStore } from '@/store'
 import { rpc } from '@/api/rpc'
-
+import { useI18n } from 'vue-i18n'
+import { useIsSmallScreen } from '@/composables/useIsSmallScreen'
+const isMobile = useIsSmallScreen()
+const labelType = computed(() => (isMobile.value ? 'top' : 'left'))
 const show = defineModel<boolean>('show', { required: true })
 const message = useMessage()
 const torrentStore = useTorrentStore()
 const sessionStore = useSessionStore()
+const { t: $t } = useI18n()
 const loading = ref(false)
 const moveData = ref(true)
 const dir = ref('')
@@ -69,17 +73,17 @@ watch(
 )
 async function onConfirm() {
   if (!dir.value.trim()) {
-    message.error('请输入新目录')
+    message.error($t('changeDirDialog.pleaseInputDir'))
     return
   }
   loading.value = true
   try {
     await rpc.torrentSetLocation(localSelectedKeys.value, dir.value.trim(), moveData.value)
     show.value = false
-    message.success('目录更改成功')
+    message.success($t('changeDirDialog.changeSuccess'))
     await torrentStore.fetchTorrents()
   } catch {
-    message.error('目录更改失败')
+    message.error($t('changeDirDialog.changeFailed'))
   } finally {
     loading.value = false
   }

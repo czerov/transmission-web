@@ -4,28 +4,33 @@
     <div class="flex items-center gap-4 hidden md:flex">
       <!-- 组1：添加磁力链接、添加种子 -->
       <div class="group-item">
-        <IconButton :icon="Magnet" tooltip="磁力链接" @click="onAddMagnet" :color="theme.primaryColor" />
-        <IconButton :icon="AddCircle" tooltip="添加种子" @click="onAddTorrent" :color="theme.primaryColor" />
+        <IconButton :icon="Magnet" :tooltip="$t('common.addMagnet')" @click="onAddMagnet" :color="theme.primaryColor" />
+        <IconButton
+          :icon="AddCircle"
+          :tooltip="$t('common.addTorrent')"
+          @click="onAddTorrent"
+          :color="theme.primaryColor"
+        />
       </div>
       <!-- 组2：开始、暂停、删除 -->
       <div class="group-item">
         <IconButton
           :icon="CaretForwardCircle"
-          tooltip="开始任务"
+          :tooltip="$t('common.startTasks')"
           @click="onStart"
           :disabled="!torrentStore.selectedKeys.length"
           :color="theme.successColor"
         />
         <IconButton
           :icon="PauseCircle"
-          tooltip="暂停任务"
+          :tooltip="$t('common.pauseTasks')"
           @click="onPause"
           :disabled="!torrentStore.selectedKeys.length"
           :color="theme.warningColor"
         />
         <IconButton
           :icon="DismissSquareIcon"
-          tooltip="删除任务"
+          :tooltip="$t('common.deleteTasks')"
           @click="onRemove"
           :color="theme.errorColor"
           :disabled="!torrentStore.selectedKeys.length"
@@ -34,14 +39,14 @@
       <!-- 组3：上移、下移、修改目录、标签、优先级（用 slot 传递占位图标） -->
       <div class="group-item">
         <IconButton
-          tooltip="上移动任务"
+          :tooltip="$t('common.moveUp')"
           @click="onMoveUp"
           :disabled="!torrentStore.selectedKeys.length"
           :icon="ArrowUpCircleSharp"
           :color="theme.infoColor"
         />
         <IconButton
-          tooltip="下移动任务"
+          :tooltip="$t('common.moveDown')"
           @click="onMoveDown"
           :disabled="!torrentStore.selectedKeys.length"
           :icon="ArrowDownCircleSharp"
@@ -50,14 +55,14 @@
       </div>
       <div class="group-item">
         <IconButton
-          tooltip="修改任务目录"
+          :tooltip="$t('common.changeDirectory')"
           @click="onChangeDir"
           :disabled="!torrentStore.selectedKeys.length"
           :icon="FolderOpenSharp"
           :color="theme.warningColor"
         />
         <IconButton
-          tooltip="修改任务标签"
+          :tooltip="$t('common.changeLabels')"
           @click="onChangeLabel"
           :disabled="!torrentStore.selectedKeys.length"
           :icon="Pricetags"
@@ -92,14 +97,25 @@
     </div>
     <div class="flex-1 mx-2">
       <!-- 搜索框 -->
-      <n-input v-model:value="torrentStore.search" placeholder="搜索任务名称" class="max-w-[600px]" clearable />
+      <n-input
+        v-model:value="torrentStore.search"
+        :placeholder="$t('common.searchPlaceholder')"
+        class="max-w-[600px]"
+        clearable
+      />
     </div>
     <!-- 右侧设置按钮 -->
-    <div class="flex items-center">
-      <IconButton tooltip="设置" @click="onSetting" :icon="SettingsSharp" :color="theme.primaryColor" />
+    <div class="flex items-center gap-2">
+      <LanguageSwitcher />
+      <IconButton
+        :tooltip="$t('common.settings')"
+        @click="onSetting"
+        :icon="SettingsSharp"
+        :color="theme.primaryColor"
+      />
       <IconButton
         v-if="!isMobile"
-        tooltip="详情"
+        :tooltip="$t('common.details')"
         @click="onLayoutBottom"
         :icon="LayoutBottom"
         :color="theme.primaryColor"
@@ -134,11 +150,14 @@ import { useMessage } from 'naive-ui'
 import { sleep } from '@/utils'
 import { priorityOptions } from './priority'
 import SettingsDialog from '../dialog/settings/SettingsDialog.vue'
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 import { useIsSmallScreen } from '@/composables/useIsSmallScreen'
+import { useI18n } from 'vue-i18n'
 const emit = defineEmits(['layoutBottom'])
 const torrentStore = useTorrentStore()
 const theme = useThemeVars()
 const message = useMessage()
+const { t: $t } = useI18n()
 const addDialogType = ref<'file' | 'magnet'>('file')
 const showDeleteDialog = ref(false)
 const showAddMagnetDialog = ref(false)
@@ -164,7 +183,7 @@ const onStart = async () => {
   await rpc.torrentStart(torrentStore.selectedKeys)
   await sleep(1000)
   await torrentStore.fetchTorrents()
-  message.success('已开始任务')
+  message.success($t('message.taskStarted'))
 }
 
 const onPause = async () => {
@@ -174,7 +193,7 @@ const onPause = async () => {
   await rpc.torrentStop(torrentStore.selectedKeys)
   await sleep(1000)
   await torrentStore.fetchTorrents()
-  message.success('已暂停任务')
+  message.success($t('message.taskPaused'))
 }
 
 const onRemove = () => {
@@ -190,7 +209,7 @@ const onMoveUp = async () => {
   }
   await rpc.queueMoveUp(torrentStore.selectedKeys)
   await torrentStore.fetchTorrents()
-  message.success('已上移任务')
+  message.success($t('message.taskMovedUp'))
 }
 
 const onMoveDown = async () => {
@@ -199,7 +218,7 @@ const onMoveDown = async () => {
   }
   await rpc.queueMoveDown(torrentStore.selectedKeys)
   await torrentStore.fetchTorrents()
-  message.success('已下移任务')
+  message.success($t('message.taskMovedDown'))
 }
 
 const onChangeDir = () => {
@@ -219,11 +238,11 @@ const onSelectPriority = async (priority: number) => {
       ids: torrentStore.selectedKeys,
       bandwidthPriority: priority
     })
-    message.success('优先级已修改')
+    message.success($t('message.priorityChanged'))
     await torrentStore.fetchTorrents()
   } catch (error) {
     console.error(error)
-    message.error('修改优先级失败')
+    message.error($t('message.priorityChangeFailed'))
   }
 }
 

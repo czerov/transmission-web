@@ -1,16 +1,16 @@
 <template>
   <div>
-    <div class="text-lg font-medium mb-2">更新间隔设置 (秒)</div>
-    <n-form label-placement="left" label-width="150" :model="form">
-      <n-form-item label="会话更新">
+    <div class="text-lg font-medium mb-2">{{ $t('pollingSettings.title') }}</div>
+    <n-form :label-placement="labelType" :label-width="labelType === 'top' ? undefined : 150" :model="form">
+      <n-form-item :label="$t('pollingSettings.sessionUpdate')">
         <n-input-number v-model:value="form.sessionInterval" :min="1" :max="3600" :step="1" class="w-40" />
       </n-form-item>
 
-      <n-form-item label="种子详情">
+      <n-form-item :label="$t('pollingSettings.torrentDetail')">
         <n-input-number v-model:value="form.torrentDetailInterval" :min="1" :max="3600" :step="1" class="w-40" />
       </n-form-item>
 
-      <n-form-item label="种子列表">
+      <n-form-item :label="$t('pollingSettings.torrentList')">
         <n-input-number v-model:value="form.torrentInterval" :min="1" :max="3600" :step="1" class="w-40" />
       </n-form-item>
     </n-form>
@@ -19,7 +19,11 @@
 
 <script setup lang="ts">
 import { useSettingStore } from '@/store'
-
+import { useI18n } from 'vue-i18n'
+import { useIsSmallScreen } from '@/composables/useIsSmallScreen'
+const isMobile = useIsSmallScreen()
+const labelType = computed(() => (isMobile ? 'top' : 'left'))
+const { t: $t } = useI18n()
 const form = defineModel<{
   sessionInterval: number
   torrentDetailInterval: number

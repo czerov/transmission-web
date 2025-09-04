@@ -1,5 +1,6 @@
 import { computed } from 'vue'
 import { useStorage } from '@vueuse/core'
+import { useI18n } from 'vue-i18n'
 
 export interface ColumnConfig {
   key: string
@@ -8,40 +9,40 @@ export interface ColumnConfig {
 }
 
 export const allColumns = [
-  { key: 'name', title: '名称', fixed: true, minWidth: 350 },
-  { key: 'totalSize', title: '总大小', minWidth: 90 },
-  { key: 'sizeWhenDone', title: '选定大小', minWidth: 90 },
-  { key: 'leftUntilDone', title: '剩余', minWidth: 90 },
-  { key: 'haveValid', title: '有效', minWidth: 90 },
-  { key: 'downloadedEver', title: '已下载', minWidth: 100 },
-  { key: 'uploadedEver', title: '已上传', minWidth: 100 },
-  { key: 'uploadedDownloaded', title: '已上传/已下载', minWidth: 130 },
-  { key: 'percentDone', title: '进度', minWidth: 120 },
-  { key: 'rateDownload', title: '下载速度', minWidth: 100 },
-  { key: 'rateUpload', title: '上传速度', minWidth: 100 },
-  { key: 'status', title: '状态', minWidth: 80 },
-  { key: 'addedDate', title: '添加时间', minWidth: 190 },
-  { key: 'peersSendingToUs', title: '种子|活跃', minWidth: 95 },
-  { key: 'peersGettingFromUs', title: '下载|活跃', minWidth: 80 },
-  { key: 'eta', title: '剩余时间', minWidth: 85 },
-  { key: 'uploadRatio', title: '分享率', minWidth: 80 },
+  { key: 'name', fixed: true, minWidth: 350 },
+  { key: 'totalSize', minWidth: 90 },
+  { key: 'sizeWhenDone', minWidth: 140 },
+  { key: 'leftUntilDone', minWidth: 90 },
+  { key: 'haveValid', minWidth: 90 },
+  { key: 'downloadedEver', minWidth: 116 },
+  { key: 'uploadedEver', minWidth: 100 },
+  { key: 'uploadedDownloaded', minWidth: 130 },
+  { key: 'percentDone', minWidth: 120 },
+  { key: 'rateDownload', minWidth: 115 },
+  { key: 'rateUpload', minWidth: 100 },
+  { key: 'status', minWidth: 80 },
+  { key: 'addedDate', minWidth: 190 },
+  { key: 'peersSendingToUs', minWidth: 95 },
+  { key: 'peersGettingFromUs', minWidth: 80 },
+  { key: 'eta', minWidth: 85 },
+  { key: 'uploadRatio', minWidth: 80 },
   // 格式化后的 tracker
-  { key: 'cachedMainTracker', title: '服务器', minWidth: 150 },
+  { key: 'cachedMainTracker', minWidth: 150 },
   // 格式化后的 tracker 状态
-  { key: 'cachedTrackerStatus', title: '服务器状态', minWidth: 100 },
-  { key: 'doneDate', title: '完成时间', minWidth: 190 },
-  { key: 'activityDate', title: '最后活动时间', minWidth: 190 },
-  { key: 'downloadDir', title: '保存目录', minWidth: 180 },
-  { key: 'bandwidthPriority', title: '优先级', minWidth: 80 },
-  { key: 'id', title: 'ID', minWidth: 80 },
-  { key: 'queuePosition', title: '队列位置', minWidth: 80 },
-  { key: 'isPrivate', title: '私有', minWidth: 60 },
-  { key: 'labels', title: '用户标签', minWidth: 100 },
-  { key: 'secondsSeeding', title: '做种时长', minWidth: 90 },
-  { key: 'group', title: '备用带宽', minWidth: 95 },
-  { key: 'file-count', title: '文件数目', minWidth: 90 },
-  { key: 'pieceCount', title: '块数目', minWidth: 90 },
-  { key: 'metadataPercentComplete', title: '元数据', minWidth: 150 }
+  { key: 'cachedTrackerStatus', minWidth: 125 },
+  { key: 'doneDate', minWidth: 190 },
+  { key: 'activityDate', minWidth: 190 },
+  { key: 'downloadDir', minWidth: 180 },
+  { key: 'bandwidthPriority', minWidth: 100 },
+  { key: 'id', minWidth: 80 },
+  { key: 'queuePosition', minWidth: 80 },
+  { key: 'isPrivate', minWidth: 60 },
+  { key: 'labels', minWidth: 100 },
+  { key: 'secondsSeeding', minWidth: 120 },
+  { key: 'group', minWidth: 95 },
+  { key: 'file-count', minWidth: 90 },
+  { key: 'pieceCount', minWidth: 90 },
+  { key: 'metadataPercentComplete', minWidth: 150 }
 ]
 
 export const defaultVisibleColumns = [
@@ -64,6 +65,8 @@ export const defaultVisibleColumns = [
 ]
 
 export function useColumns(storageKey = 'torrent-columns') {
+  const { t } = useI18n()
+
   // 初始化 visibleColumns
   const columns = useStorage<ColumnConfig[]>(
     storageKey,
@@ -100,6 +103,11 @@ export function useColumns(storageKey = 'torrent-columns') {
     columns.value = arr
   }
 
+  // 获取列的国际化标题
+  function getColumnTitle(key: string): string {
+    return t(`columns.${key}`)
+  }
+
   const visibleColumns = computed(() => columns.value.filter((col) => col.visible))
   const tableMinWidth = computed(() => visibleColumns.value.reduce((sum, col) => sum + (col.width || 150), 0))
   const mapColumnWidth = computed(() => {
@@ -117,6 +125,7 @@ export function useColumns(storageKey = 'torrent-columns') {
     updateColumnWidth,
     toggleColumnVisible,
     moveColumn,
+    getColumnTitle,
     visibleColumns,
     tableMinWidth,
     mapColumnWidth

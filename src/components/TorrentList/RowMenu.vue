@@ -7,10 +7,11 @@
     :options="dropdownOptions"
     @select="onDropdownSelect"
     class="row-drop-down-menus"
+    :class="$style['row-drop-down-menus']"
     :to="to"
     :z-index="1000"
     :animated="false"
-    :style="{ maxHeight: maxHeight }"
+    :style="{ maxHeight: maxHeight, maxWidth: '60dvw' }"
     scrollable
   />
   <DeleteTorrentDialog v-model:show="showDeleteDialog" :ids="id ? [id] : undefined" />
@@ -47,6 +48,7 @@ import {
 } from '@vicons/ionicons5'
 import AnyTouchCore from 'any-touch'
 import { useThemeVars } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
 
 const settingStore = useSettingStore()
 const at = new AnyTouchCore(document.body, {
@@ -56,6 +58,7 @@ at.use(AnyTouchCore.tap)
 
 const theme = useThemeVars()
 const torrentStore = useTorrentStore()
+const { t } = useI18n()
 const props = defineProps<{
   x: number
   y: number
@@ -70,72 +73,74 @@ const showChangeDirDialog = ref(false)
 const showChangeLabelDialog = ref(false)
 const showChangeTrackerDialog = ref(false)
 const showChangeOtherDialog = ref(false)
-const dropdownOptions = [
-  { label: '强制开始', key: 'forceStart', icon: renderIcon(FlashSharp, theme.value.primaryColor) },
-  { label: '开始', key: 'start', icon: renderIcon(CaretForwardCircle, theme.value.primaryColor) },
-  { label: '暂停', key: 'stop', icon: renderIcon(PauseCircle, theme.value.primaryColor) },
-  { label: '重新校验', key: 'verify', icon: renderIcon(RefreshCircle, theme.value.primaryColor) },
-  { label: '删除', key: 'remove', icon: renderIcon(DismissSquareIcon, theme.value.errorColor) },
-  {
-    type: 'divider',
-    key: 'd1'
-  },
-  { label: '重新汇报(获取更多peer)', key: 'reannounce', icon: renderIcon(RefreshCircle, theme.value.primaryColor) },
-  { label: '变更目录', key: 'changeDir', icon: renderIcon(FolderOpenSharp, theme.value.primaryColor) },
-  {
-    type: 'divider',
-    key: 'd2'
-  },
-  { label: '复制名称', key: 'copyName', icon: renderIcon(CopySharp, theme.value.primaryColor) },
-  { label: '复制路径', key: 'copyPath', icon: renderIcon(FolderCopyIcon, theme.value.primaryColor) },
-  { label: '复制磁力链接', key: 'copyMagnet', icon: renderIcon(MagnetSharp, theme.value.primaryColor) },
-  {
-    type: 'divider',
-    key: 'd3'
-  },
-  { label: '修改标签', key: 'changeLabel', icon: renderIcon(Pricetags, theme.value.primaryColor) },
-  {
-    label: '队列操作',
-    key: 'queue',
-    icon: renderIcon(StarSharp, theme.value.primaryColor),
-    children: [
-      {
-        label: '队列置顶',
-        key: 'moveTop',
-        icon: renderIcon(DoubleArrowUpIcon, theme.value.infoColor)
-      },
-      {
-        label: '队列上移',
-        key: 'moveUp',
-        icon: renderIcon(ArrowUpIcon, theme.value.infoColor)
-      },
-      {
-        label: '队列下移',
-        key: 'moveDown',
-        icon: renderIcon(ArrowDownIcon, theme.value.infoColor)
-      },
-      {
-        label: '队列置底',
-        key: 'moveBottom',
-        icon: renderIcon(DoubleArrowDownIcon, theme.value.infoColor)
-      }
-    ]
-  },
-  {
-    type: 'divider',
-    key: 'd4'
-  },
-  {
-    label: '修改tracker',
-    key: 'changeTracker',
-    icon: renderIcon(WifiSharp, theme.value.primaryColor)
-  },
-  {
-    label: '修改限速等限制属性',
-    key: 'other',
-    icon: renderIcon(SettingsSharp, theme.value.primaryColor)
-  }
-]
+const dropdownOptions = computed(() => {
+  return [
+    { label: t('rowMenu.forceStart'), key: 'forceStart', icon: renderIcon(FlashSharp, theme.value.primaryColor) },
+    { label: t('rowMenu.start'), key: 'start', icon: renderIcon(CaretForwardCircle, theme.value.primaryColor) },
+    { label: t('rowMenu.stop'), key: 'stop', icon: renderIcon(PauseCircle, theme.value.primaryColor) },
+    { label: t('rowMenu.verify'), key: 'verify', icon: renderIcon(RefreshCircle, theme.value.primaryColor) },
+    { label: t('rowMenu.remove'), key: 'remove', icon: renderIcon(DismissSquareIcon, theme.value.errorColor) },
+    {
+      type: 'divider',
+      key: 'd1'
+    },
+    { label: t('rowMenu.reannounce'), key: 'reannounce', icon: renderIcon(RefreshCircle, theme.value.primaryColor) },
+    { label: t('rowMenu.changeDir'), key: 'changeDir', icon: renderIcon(FolderOpenSharp, theme.value.primaryColor) },
+    {
+      type: 'divider',
+      key: 'd2'
+    },
+    { label: t('rowMenu.copyName'), key: 'copyName', icon: renderIcon(CopySharp, theme.value.primaryColor) },
+    { label: t('rowMenu.copyPath'), key: 'copyPath', icon: renderIcon(FolderCopyIcon, theme.value.primaryColor) },
+    { label: t('rowMenu.copyMagnet'), key: 'copyMagnet', icon: renderIcon(MagnetSharp, theme.value.primaryColor) },
+    {
+      type: 'divider',
+      key: 'd3'
+    },
+    { label: t('rowMenu.changeLabel'), key: 'changeLabel', icon: renderIcon(Pricetags, theme.value.primaryColor) },
+    {
+      label: t('rowMenu.queue'),
+      key: 'queue',
+      icon: renderIcon(StarSharp, theme.value.primaryColor),
+      children: [
+        {
+          label: t('rowMenu.moveTop'),
+          key: 'moveTop',
+          icon: renderIcon(DoubleArrowUpIcon, theme.value.infoColor)
+        },
+        {
+          label: t('rowMenu.moveUp'),
+          key: 'moveUp',
+          icon: renderIcon(ArrowUpIcon, theme.value.infoColor)
+        },
+        {
+          label: t('rowMenu.moveDown'),
+          key: 'moveDown',
+          icon: renderIcon(ArrowDownIcon, theme.value.infoColor)
+        },
+        {
+          label: t('rowMenu.moveBottom'),
+          key: 'moveBottom',
+          icon: renderIcon(DoubleArrowDownIcon, theme.value.infoColor)
+        }
+      ]
+    },
+    {
+      type: 'divider',
+      key: 'd4'
+    },
+    {
+      label: t('rowMenu.changeTracker'),
+      key: 'changeTracker',
+      icon: renderIcon(WifiSharp, theme.value.primaryColor)
+    },
+    {
+      label: t('rowMenu.other'),
+      key: 'other',
+      icon: renderIcon(SettingsSharp, theme.value.primaryColor)
+    }
+  ]
+})
 
 watch(
   () => props.y,
@@ -170,7 +175,7 @@ onUnmounted(() => {
 async function onDropdownSelect(key: string) {
   const ids = props.id ? [props.id] : torrentStore.selectedKeys
   if (!ids || ids.length === 0) {
-    message.warning('请先选择任务')
+    message.warning(t('messages.pleaseSelectTask'))
     return
   }
   switch (key) {
@@ -178,25 +183,25 @@ async function onDropdownSelect(key: string) {
       await rpc.torrentStart(ids)
       await sleep(1000)
       await torrentStore.fetchTorrents()
-      message.success('已开始任务')
+      message.success(t('messages.taskStarted'))
       break
     case 'forceStart':
       await rpc.torrentStartNow(ids)
       await sleep(1000)
       await torrentStore.fetchTorrents()
-      message.success('已强制开始任务')
+      message.success(t('messages.taskForceStarted'))
       break
     case 'stop':
       await rpc.torrentStop(ids)
       await sleep(1000)
       await torrentStore.fetchTorrents()
-      message.success('已暂停任务')
+      message.success(t('messages.taskPaused'))
       break
     case 'verify':
       await rpc.torrentVerify(ids)
       await sleep(1000)
       await torrentStore.fetchTorrents()
-      message.success('已重新校验任务')
+      message.success(t('messages.taskVerified'))
       break
     case 'remove':
       showDeleteDialog.value = true
@@ -205,9 +210,9 @@ async function onDropdownSelect(key: string) {
       const names = ids.map((id) => torrentStore.torrents.find((t) => t.id === id)?.name).join('\n')
       const nameSuccess = await copyToClipboard(names)
       if (nameSuccess) {
-        message.success('已复制名称')
+        message.success(t('messages.nameCopied'))
       } else {
-        message.error('复制失败，请重试')
+        message.error(t('messages.copyFailed'))
       }
       break
     case 'copyPath':
@@ -219,25 +224,25 @@ async function onDropdownSelect(key: string) {
         .join('\n')
       const pathSuccess = await copyToClipboard(paths)
       if (pathSuccess) {
-        message.success('已复制路径')
+        message.success(t('messages.pathCopied'))
       } else {
-        message.error('复制失败，请重试')
+        message.error(t('messages.copyFailed'))
       }
       break
     case 'copyMagnet':
       const magnets = ids.map((id) => torrentStore.torrents.find((t) => t.id === id)?.magnetLink).join('\n')
       const magnetSuccess = await copyToClipboard(magnets)
       if (magnetSuccess) {
-        message.success('已复制磁力链接')
+        message.success(t('messages.magnetCopied'))
       } else {
-        message.error('复制失败，请重试')
+        message.error(t('messages.copyFailed'))
       }
       break
     case 'reannounce':
       await rpc.torrentReannounce(ids)
       await sleep(1000)
       await torrentStore.fetchTorrents()
-      message.success('已重新汇报')
+      message.success(t('messages.reannounced'))
       break
     case 'changeDir':
       showChangeDirDialog.value = true
@@ -249,25 +254,25 @@ async function onDropdownSelect(key: string) {
       await rpc.queueMoveTop(ids)
       await sleep(1000)
       await torrentStore.fetchTorrents()
-      message.success('已置顶')
+      message.success(t('messages.movedToTop'))
       break
     case 'moveUp':
       await rpc.queueMoveUp(ids)
       await sleep(1000)
       await torrentStore.fetchTorrents()
-      message.success('已上移')
+      message.success(t('messages.movedUp'))
       break
     case 'moveDown':
       await rpc.queueMoveDown(ids)
       await sleep(1000)
       await torrentStore.fetchTorrents()
-      message.success('已下移')
+      message.success(t('messages.movedDown'))
       break
     case 'moveBottom':
       await rpc.queueMoveBottom(ids)
       await sleep(1000)
       await torrentStore.fetchTorrents()
-      message.success('已置底')
+      message.success(t('messages.movedToBottom'))
       break
     case 'changeTracker':
       showChangeTrackerDialog.value = true
@@ -278,3 +283,22 @@ async function onDropdownSelect(key: string) {
   }
 }
 </script>
+
+<style lang="less" module>
+.row-drop-down-menus {
+  :global {
+    .n-scrollbar-container {
+      .n-scrollbar-content {
+        min-width: fit-content;
+        .n-dropdown-divider {
+          width: 100%;
+          min-width: fit-content;
+        }
+        .n-dropdown-option {
+          min-width: fit-content;
+        }
+      }
+    }
+  }
+}
+</style>

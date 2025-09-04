@@ -5,12 +5,14 @@
 import StormTracker from '@/assets/icons/stormTracker.svg?component'
 import { useTorrentStore } from '@/store'
 import { renderIcon } from '@/utils'
+import { useI18n } from 'vue-i18n'
 
 const torrentStore = useTorrentStore()
+const { t: $t } = useI18n()
 const menuOpts = computed(() => {
   return [
     {
-      label: '服务器分布',
+      label: $t('sidebar.tracker'),
       key: 'tracker',
       icon: renderIcon(StormTracker),
       children: torrentStore.trackerOptions.map((item) => ({

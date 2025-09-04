@@ -110,7 +110,8 @@ export const useTorrentStore = defineStore('torrent', () => {
     moveColumn,
     visibleColumns,
     tableMinWidth,
-    mapColumnWidth
+    mapColumnWidth,
+    getColumnTitle
   } = useColumns()
 
   // 真正的一次循环计算所有数据
@@ -164,7 +165,6 @@ export const useTorrentStore = defineStore('torrent', () => {
     if (!downloadDirSet.get(downloadDirFilter.value)) {
       downloadDirFilter.value = 'all'
     }
-
     const options = {
       labelsOptions: mapToOptions(labelsSet, torrents.value.length),
       trackerOptions: mapToOptions(trackerSet, torrents.value.length),
@@ -241,6 +241,7 @@ export const useTorrentStore = defineStore('torrent', () => {
   })
   ;(window as any).torrents = torrents
   return {
+    getColumnTitle,
     torrents,
     filterTorrents,
     mapFilterTorrentsIndex,

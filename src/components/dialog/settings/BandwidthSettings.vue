@@ -1,13 +1,15 @@
 <template>
   <div>
-    <div class="text-lg font-medium mb-2">带宽设置</div>
-    <n-form label-placement="left" label-width="180" :model="form">
+    <div class="text-lg font-medium mb-2">{{ $t('bandwidthSettings.title') }}</div>
+    <n-form :label-placement="labelType" :label-width="labelType === 'top' ? undefined : 180" :model="form">
       <div class="flex flex-row gap-4 flex-wrap">
         <div class="min-w-[360px]">
-          <div class="text-base font-medium mb-2">正常</div>
+          <div class="text-base font-medium mb-2">{{ $t('bandwidthSettings.normal') }}</div>
           <n-form-item>
             <template #label>
-              <n-checkbox v-model:checked="form['speed-limit-down-enabled']"> 最大下载速度 (KB/s)</n-checkbox>
+              <n-checkbox v-model:checked="form['speed-limit-down-enabled']">{{
+                $t('bandwidthSettings.maxDownloadSpeed')
+              }}</n-checkbox>
             </template>
             <n-input-number
               v-model:value="form['speed-limit-down']"
@@ -20,7 +22,9 @@
 
           <n-form-item>
             <template #label>
-              <n-checkbox v-model:checked="form['speed-limit-up-enabled']"> 最大上传速度 (KB/s)</n-checkbox>
+              <n-checkbox v-model:checked="form['speed-limit-up-enabled']">{{
+                $t('bandwidthSettings.maxUploadSpeed')
+              }}</n-checkbox>
             </template>
             <n-input-number
               v-model:value="form['speed-limit-up']"
@@ -33,35 +37,45 @@
         </div>
 
         <div class="min-w-[360px]">
-          <div class="text-base font-medium mb-2">备用</div>
-          <n-form-item label="最大下载速度 (KB/s)">
+          <div class="text-base font-medium mb-2">{{ $t('bandwidthSettings.backup') }}</div>
+          <n-form-item :label="$t('bandwidthSettings.maxDownloadSpeed')">
             <n-input-number v-model:value="form['alt-speed-down']" :min="0" :step="1024" class="w-32" />
           </n-form-item>
 
-          <n-form-item label="最大上传速度 (KB/s)">
+          <n-form-item :label="$t('bandwidthSettings.maxUploadSpeed')">
             <n-input-number v-model:value="form['alt-speed-up']" :min="0" :step="1024" class="w-32" />
           </n-form-item>
         </div>
       </div>
 
-      <n-form-item label="启用备用带宽">
+      <n-form-item :label="$t('bandwidthSettings.enableBackupBandwidth')" label-placement="left">
         <n-checkbox v-model:checked="form['alt-speed-enabled']"> </n-checkbox>
       </n-form-item>
 
       <div class="flex flex-row gap-2 flex-wrap">
-        <n-form-item label="自动启用备用带宽设置 (时间段内)" label-width="240">
+        <n-form-item :label="$t('bandwidthSettings.autoEnableBackup')" label-width="240" label-placement="left">
           <n-checkbox v-model:checked="form['alt-speed-time-enabled']"> </n-checkbox>
         </n-form-item>
         <div class="flex flex-row gap-2">
-          <n-form-item label="从" label-width="30" v-if="form['alt-speed-time-enabled']">
+          <n-form-item
+            :label="$t('bandwidthSettings.from')"
+            label-width="50"
+            v-if="form['alt-speed-time-enabled']"
+            label-placement="left"
+          >
             <n-time-picker v-model:value="altSpeedTimeBegin" format="HH:mm" class="w-32" />
           </n-form-item>
-          <n-form-item label="到" label-width="30" v-if="form['alt-speed-time-enabled']">
+          <n-form-item
+            :label="$t('bandwidthSettings.to')"
+            label-width="30"
+            v-if="form['alt-speed-time-enabled']"
+            label-placement="left"
+          >
             <n-time-picker v-model:value="altSpeedTimeEnd" format="HH:mm" class="w-32" />
           </n-form-item>
         </div>
       </div>
-      <div v-if="form['alt-speed-time-enabled']" class="flex items-center gap-4 flex-wrap pl-[20px]">
+      <div v-if="form['alt-speed-time-enabled']" class="flex content-between items-center gap-4 flex-wrap pl-[20px]">
         <n-checkbox
           v-for="(day, index) in DaysOfTheWeek"
           :key="day"
@@ -76,9 +90,21 @@
 
 <script setup lang="ts">
 import type { SessionArguments } from '@/api/rpc'
+import { useIsSmallScreen } from '@/composables/useIsSmallScreen'
 import { useSessionStore } from '@/store'
-
-const DaysOfTheWeek = ['星期天', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'] as const
+import { useI18n } from 'vue-i18n'
+const isMobile = useIsSmallScreen()
+const labelType = computed(() => (isMobile ? 'top' : 'left'))
+const { t: $t } = useI18n()
+const DaysOfTheWeek = computed(() => [
+  $t('bandwidthSettings.sunday'),
+  $t('bandwidthSettings.monday'),
+  $t('bandwidthSettings.tuesday'),
+  $t('bandwidthSettings.wednesday'),
+  $t('bandwidthSettings.thursday'),
+  $t('bandwidthSettings.friday'),
+  $t('bandwidthSettings.saturday')
+])
 const form = defineModel<SessionArguments>('form', { required: true })
 const sessionStore = useSessionStore()
 const session = computed(() => sessionStore.session)

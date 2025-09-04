@@ -23,33 +23,40 @@ import {
 } from '@vicons/ionicons5'
 import { useThemeVars } from 'naive-ui'
 import { priorityOptions } from './priority'
+import { useI18n } from 'vue-i18n'
 
 const theme = useThemeVars()
 const emit = defineEmits(['action'])
 const torrentStore = useTorrentStore()
+const { t: $t } = useI18n()
 
 const isOk = computed(() => torrentStore.selectedKeys.length > 0)
 
 const mobileActionOptions = computed(() => [
   {
-    label: '磁力链接',
+    label: $t('common.addMagnet'),
     key: 'addMagnet',
     icon: renderIcon(Magnet, theme.value.primaryColor)
   },
   {
-    label: '添加种子',
+    label: $t('common.addTorrent'),
     key: 'addTorrent',
     icon: renderIcon(AddCircle, theme.value.primaryColor)
   },
   {
-    label: '开始任务',
+    label: $t('common.startTasks'),
     key: 'start',
     disabled: !isOk.value,
     icon: renderIcon(CaretForwardCircle, theme.value.primaryColor)
   },
-  { label: '停止', key: 'pause', disabled: !isOk.value, icon: renderIcon(PauseCircle, theme.value.primaryColor) },
   {
-    label: '删除任务',
+    label: $t('common.pauseTasks'),
+    key: 'pause',
+    disabled: !isOk.value,
+    icon: renderIcon(PauseCircle, theme.value.primaryColor)
+  },
+  {
+    label: $t('common.deleteTasks'),
     key: 'remove',
     disabled: !isOk.value,
     icon: renderIcon(DismissSquareIcon, theme.value.errorColor)
@@ -59,13 +66,13 @@ const mobileActionOptions = computed(() => [
     key: 'd1'
   },
   {
-    label: '上移任务',
+    label: $t('common.moveUp'),
     key: 'moveUp',
     disabled: !isOk.value,
     icon: renderIcon(ArrowUpCircleSharp, theme.value.infoColor)
   },
   {
-    label: '下移任务',
+    label: $t('common.moveDown'),
     key: 'moveDown',
     disabled: !isOk.value,
     icon: renderIcon(ArrowDownCircleSharp, theme.value.infoColor)
@@ -75,15 +82,20 @@ const mobileActionOptions = computed(() => [
     key: 'd2'
   },
   {
-    label: '任务目录',
+    label: $t('common.changeDirectory'),
     key: 'changeDir',
     disabled: !isOk.value,
     icon: renderIcon(FolderOpenSharp, theme.value.warningColor)
   },
-  { label: '任务标签', key: 'changeLabel', disabled: !isOk.value, icon: renderIcon(Pricetags, theme.value.infoColor) },
+  {
+    label: $t('common.changeLabels'),
+    key: 'changeLabel',
+    disabled: !isOk.value,
+    icon: renderIcon(Pricetags, theme.value.infoColor)
+  },
 
   {
-    label: '优先级',
+    label: $t('common.priority'),
     key: 'priority',
     disabled: !isOk.value,
     icon: renderIcon(StarSharp, theme.value.warningColor),

@@ -99,6 +99,22 @@ const loadingDetail = ref(false)
 
 const bodyHeight = ref(document.body.clientHeight || document.documentElement.clientHeight)
 
+// 获取考虑安全区域的可用高度
+const getAvailableHeight = () => {
+  const viewportHeight = window.innerHeight
+  const safeAreaTop = settingStore.safeArea.top
+  const safeAreaBottom = settingStore.safeArea.bottom
+  return viewportHeight - safeAreaTop - safeAreaBottom
+}
+
+// 初始化高度
+bodyHeight.value = getAvailableHeight()
+
+// 事件处理函数
+const handleResize = () => {
+  bodyHeight.value = getAvailableHeight()
+}
+
 const listheight = computed(() => {
   const detailHeight = !isMobile.value && pcDetailVisible.value ? settingStore.detailHeight : 0
   return bodyHeight.value - settingStore.headerHeight - settingStore.footerHeight - detailHeight
@@ -124,7 +140,7 @@ watch([pcDetailVisible, mobileDetailVisible, () => torrentStore.selectedKeys], (
 
 const scrollContainer = ref<HTMLElement>(document.body)
 useResizeObserver(scrollContainer, () => {
-  bodyHeight.value = scrollContainer.value?.clientHeight!
+  bodyHeight.value = getAvailableHeight()
 })
 
 const girdLayout = computed(() => {
@@ -156,6 +172,11 @@ function onLayoutBottom() {
 
 onMounted(async () => {
   loading.value = true
+
+  // 设置事件监听器，确保在设备旋转或安全区域变化时更新高度
+  window.addEventListener('resize', handleResize)
+  window.addEventListener('orientationchange', handleResize)
+
   // torrentStore.startPolling()
   // statsStore.startPolling()
   await sessionStore.fetchSession()
@@ -168,6 +189,10 @@ onMounted(async () => {
 onUnmounted(() => {
   torrentStore.stopPolling()
   statsStore.stopPolling()
+
+  // 清理事件监听器
+  window.removeEventListener('resize', handleResize)
+  window.removeEventListener('orientationchange', handleResize)
 })
 </script>
 

@@ -37,6 +37,7 @@ declare module 'vue' {
     IsPrivateCell: typeof import('./src/components/TorrentList/cells/IsPrivateCell.vue')['default']
     LabelMenu: typeof import('./src/components/SiderbarView.vue/menus/LabelMenu.vue')['default']
     LabelsCell: typeof import('./src/components/TorrentList/cells/LabelsCell.vue')['default']
+    LanguageSwitcher: typeof import('./src/components/LanguageSwitcher.vue')['default']
     LayoutView: typeof import('./src/components/LayoutView.vue')['default']
     ListHeader: typeof import('./src/components/CanvasList/ListHeader.vue')['default']
     MobileActionDropdown: typeof import('./src/components/AppHeader/MobileActionDropdown.vue')['default']
