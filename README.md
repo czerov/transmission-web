@@ -3,86 +3,116 @@
 <div align="center">
   <img src="public/transmission.svg" alt="Transmission Web" width="120" height="120">
 
-  <h3>🚀 现代化的 Transmission BitTorrent 客户端 Web 界面</h3>
+  <h3>🚀 Modern Transmission BitTorrent Client Web Interface</h3>
 
-  <p>基于 Vue 3 + TypeScript 构建的高性能 BitTorrent 管理界面</p>
+  <p>High-performance BitTorrent management interface built with Vue 3 + TypeScript</p>
+
+  <div style="margin: 20px 0;">
+    <a href="README.zh-CN.md" style="text-decoration: none; padding: 8px 16px; background: #0366d6; color: white; border-radius: 6px; margin-right: 10px;">🇨🇳 中文</a>
+    <span style="padding: 8px 16px; background: #28a745; color: white; border-radius: 6px;">🇺🇸 English</span>
+  </div>
 
   [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
   [![Vue 3](https://img.shields.io/badge/Vue-3.5+-brightgreen.svg)](https://vuejs.org/)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.8+-blue.svg)](https://www.typescriptlang.org/)
   [![Naive UI](https://img.shields.io/badge/Naive_UI-2.42+-lightblue.svg)](https://www.naiveui.com/)
+  [![Node.js](https://img.shields.io/badge/Node.js-20.0+-green.svg)](https://nodejs.org/)
+  [![pnpm](https://img.shields.io/badge/pnpm-10.0+-orange.svg)](https://pnpm.io/)
+  [![Vite](https://img.shields.io/badge/Vite-7.0+-purple.svg)](https://vitejs.dev/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0+-38B2AC.svg)](https://tailwindcss.com/)
 </div>
 
-## 📖 项目简介
+## 📖 Project Description
 
-Transmission Web 是一个现代化的 Transmission BitTorrent 客户端 Web 界面，采用最新的前端技术栈重新设计开发。提供了简洁美观的用户界面、丰富的功能特性和优秀的用户体验。
+Transmission Web is a modern Transmission BitTorrent client web interface, redesigned and developed using the latest frontend technology stack. It provides a clean and beautiful user interface, rich feature set, and excellent user experience.
 
-### ✨ 主要特性
+### 🌟 Why Choose Transmission Web?
 
-- 🎨 **现代化界面** - 基于 Naive UI 设计系统，支持亮色/暗色主题
-- 📱 **响应式设计** - 完美适配桌面端和移动端设备
-- ⚡ **高性能** - (canvas)虚拟滚动技术，轻松处理大量种子列表
-- 🔍 **智能过滤** - 支持状态、标签、站点、错误状态等多维度过滤
-- 📊 **数据可视化** - 丰富的进度条、统计图表和状态指示器
-- 🎯 **便捷操作** - 支持批量操作、拖拽排序、快捷键等
-- 🌐 **国际化** - 多语言支持（计划中）
-- 🔧 **可定制** - 灵活的列配置、布局调整等个性化设置
+- **🎯 User Experience Focused** - BitTorrent management interface designed for modern web environments
+- **🚀 Technologically Advanced** - Built with Vue 3 + TypeScript latest technology stack
+- **📱 Cross-Platform Support** - Perfectly adapted for desktop, tablet, and mobile devices
+- **⚡ High Performance** - Virtual scrolling technology to easily handle tens of thousands of torrents
+- **🔧 Highly Customizable** - Support for theme switching, layout adjustments, column configuration, etc.
+- **🌍 Internationalization** - Multi-language interface, user-friendly for global users
 
-### 🚀 功能亮点
+### ✨ Key Features
 
-#### 种子管理
-- ✅ 添加种子文件或磁力链接
-- ✅ 暂停/继续/删除种子
-- ✅ 修改种子优先级
-- ✅ 更改下载路径
-- ✅ 编辑种子标签
-- ✅ 修改 Tracker 信息
+- 🎨 **Modern Interface** - Based on Naive UI design system with light/dark theme support
+- 📱 **Responsive Design** - Perfectly adapted for desktop and mobile devices
+- ⚡ **High Performance** - (Canvas) Virtual scrolling technology to easily handle large torrent lists
+- 🔍 **Smart Filtering** - Multi-dimensional filtering by status, labels, sites, error states, etc.
+- 📊 **Data Visualization** - Rich progress bars, statistical charts, and status indicators
+- 🎯 **Convenient Operations** - Support for batch operations, drag-and-drop sorting, keyboard shortcuts, etc.
+- 🌐 **Internationalization** - Multi-language support (Chinese, English)
+- 🔧 **Customizable** - Flexible column configuration, layout adjustments, and other personalization options
 
-#### 界面特性
-- ✅ 可拖拽调整的侧边栏
-- ✅ 自定义表格列显示
-- ✅ 虚拟滚动优化大数据性能
-- ✅ 右键上下文菜单
-- ✅ 移动端长按操作支持
+### 🚀 Feature Highlights
 
-#### 数据展示
-- ✅ 实时下载/上传速度
-- ✅ 种子完成进度
-- ✅ 连接用户数统计
-- ✅ 错误状态提示
-- ✅ 详细的种子信息
+#### Torrent Management
+- ✅ Add torrent files or magnet links
+- ✅ Pause/resume/delete torrents
+- ✅ Modify torrent priority
+- ✅ Change download path
+- ✅ Edit torrent labels
+- ✅ Modify Tracker information
 
-## 🛠️ 技术栈
+#### Interface Features
+- ✅ Draggable adjustable sidebar
+- ✅ Customizable table column display
+- ✅ Virtual scrolling for large data performance optimization
+- ✅ Right-click context menu
+- ✅ Mobile long-press operation support
 
-- **框架**: Vue 3 (Composition API)
-- **语言**: TypeScript
-- **构建工具**: Vite
-- **UI 组件库**: Naive UI
-- **样式方案**: Tailwind CSS + UnoCSS + Less
-- **状态管理**: Pinia
-- **路由**: Vue Router
-- **HTTP 客户端**: Axios
-- **虚拟滚动**: Vue Virtual Scroller
-- **工具库**: VueUse, Day.js, Lodash
+#### Data Display
+- ✅ Real-time download/upload speed
+- ✅ Torrent completion progress
+- ✅ Connected user count statistics
+- ✅ Error status indicators
+- ✅ Detailed torrent information
 
+## 🌍 Internationalization Support
 
-## 🐳 Docker 部署
+The project fully supports internationalization and currently supports the following languages:
+- 🇨🇳 Simplified Chinese (zh-CN) - Available
+- 🇺🇸 English (en-US) - Default language
 
-项目提供了 Docker 支持，可以快速部署到任何支持 Docker 的环境。
+### Language Switching
+Users can easily switch interface languages through the settings page or language switcher, and the system will automatically remember user language preferences.
 
-### 构建镜像
+## 🛠️ Technology Stack
+
+- **Framework**: Vue 3 (Composition API) - Latest version of progressive JavaScript framework
+- **Language**: TypeScript 5.8+ - Complete type safety and development experience
+- **Build Tool**: Vite 7.0+ - Lightning-fast frontend build tool
+- **UI Component Library**: Naive UI 2.42+ - Complete Vue 3 component library
+- **Styling Solution**: Tailwind CSS 4.0 + UnoCSS + Less - Modern CSS solution
+- **State Management**: Pinia 3.0+ - Vue officially recommended state management library
+- **Routing**: Vue Router 4.5+ - Vue.js official router manager
+- **HTTP Client**: Axios - Promise-based HTTP client
+- **Virtual Scrolling**: Vue Virtual Scroller - High-performance large data rendering solution
+- **Utility Libraries**: VueUse, Day.js, Lodash - Practical utility function collections
+- **Mobile Support**: AnyTouch - Professional touch event handling library
+- **Internationalization**: Vue I18n - Vue.js internationalization plugin
+
+## 🐳 Docker Deployment
+
+The project provides Docker support and can be quickly deployed to any Docker-compatible environment.
+
+### Build Image
 
 ```bash
 docker build -t transmission-web .
 ```
 
-### 运行容器
+### Run Container
 
 ```bash
 docker run -d -p 7632:7632 jianxcao/transmission-web
 ```
-### 运行容器 docker-compose
-``` bash
+
+### Run Container with Docker Compose
+
+```yaml
 services:
   tr-web:
     image: jianxcao/transmission-web
@@ -94,116 +124,136 @@ services:
     restart: unless-stopped
 ```
 
+## Configure Transmission Docker
 
-## 配置transmission docker 运行
--  下载 [release](https://github.com/jianxcao/transmission-web/releases) 页面下的压缩包 **transmission-web-*.zip**
--  解压内容到服务器的目录（tr 容器需可以访问该目录）
--  配置 env TRANSMISSION_WEB_HOME为解压的目录
+- Download the **transmission-web-*.zip** package from the [release](https://github.com/jianxcao/transmission-web/releases) page
+- Extract the contents to a server directory (tr container needs access to this directory)
+- Configure env TRANSMISSION_WEB_HOME to the extracted directory
 
+## Interface Preview
 
-## 界面预览
-![面板](./docs/imgs/dashborad.png)
-![移动端卡片](./docs/imgs/mobileCard.png)
-![移动端面板](./docs/imgs/mobileDashborad.png)
-![移动端菜单](./docs/imgs/mobileSiderbar.png)
-![添加种子](./docs/imgs/add.png)
+![Dashboard](./docs/imgs/dashborad.png)
+![Mobile Card](./docs/imgs/mobileCard.png)
+![Mobile Dashboard](./docs/imgs/mobileDashborad.png)
+![Mobile Sidebar](./docs/imgs/mobileSiderbar.png)
+![Add Torrent](./docs/imgs/add.png)
 
-## 📦 安装与运行
+## 📦 Installation and Running
 
-### 环境要求
+### Requirements
 
-- Node.js >= 18.0.0
-- pnpm >= 8.0.0 (推荐)
+- Node.js >= 20.0.0 (LTS version recommended)
+- pnpm >= 10.0.0 (recommended package manager)
+- Git (for cloning the project)
 
-### 克隆项目
+### Clone Project
 
 ```bash
 git clone https://github.com/jianxcao/transmission-web.git
 cd transmission-web
 ```
 
-### 安装依赖
+### Install Dependencies
 
 ```bash
-# 使用 pnpm (推荐)
+# Use pnpm (recommended)
 pnpm install
 
-# 或使用 npm
+# Or use npm
 npm install
 
-# 或使用 yarn
+# Or use yarn
 yarn install
 ```
 
-### 开发环境运行
+### Development Environment
 
 ```bash
 pnpm dev
 ```
 
-访问 http://localhost:5173
+Visit: http://localhost:5173
 
-### 生产环境构建
+### Production Build
 
 ```bash
 pnpm build
 ```
 
-
-## 📁 项目结构
+## 📁 Project Structure
 
 ```
 src/
-├── api/              # API 接口
-├── assets/           # 静态资源
-├── components/       # 可复用组件
-│   ├── AppHeader/    # 应用头部
-│   ├── CanvasList/   # 画布列表 (主要列表组件)
-│   ├── TorrentList/  # 种子列表
-│   ├── SiderbarView/ # 侧边栏
-│   └── dialog/       # 对话框组件
-├── composables/      # 组合式函数
-├── store/            # Pinia 状态管理
-├── utils/            # 工具函数
-├── views/            # 页面组件
-└── types/            # TypeScript 类型定义
+├── api/              # API interfaces
+├── assets/           # Static assets
+├── components/       # Reusable components
+│   ├── AppHeader/    # App header
+│   ├── CanvasList/   # Canvas list (main list component)
+│   ├── TorrentList/  # Torrent list
+│   ├── SiderbarView/ # Sidebar
+│   └── dialog/       # Dialog components
+├── composables/      # Composables
+├── store/            # Pinia state management
+├── utils/            # Utility functions
+├── views/            # Page components
+└── types/            # TypeScript type definitions
 ```
 
-## 🤝 参与贡献
+## 🤝 Contributing
 
-我们欢迎各种形式的贡献，包括但不限于：
+We welcome contributions in various forms, including but not limited to:
 
-- 🐛 Bug 报告
-- 💡 功能建议
-- 📝 文档改进
-- 🔧 代码贡献
+- 🐛 Bug Reports - Help us find and fix issues
+- 💡 Feature Suggestions - Share your ideas and needs
+- 📝 Documentation Improvements - Improve project documentation and examples
+- 🔧 Code Contributions - Submit Pull Requests to improve code
+- 🌍 Internationalization Support - Add support for more languages
+- 🎨 UI/UX Improvements - Optimize user interface and experience
 
-### 开发规范
+### Development Standards
 
-- 使用 Vue 3 Composition API
-- 遵循 TypeScript 最佳实践
-- 使用 ESLint + Prettier 进行代码格式化
-- 提交信息遵循 Conventional Commits 规范
+- Use Vue 3 Composition API and TypeScript
+- Follow Vue.js official style guide
+- Use ESLint + Prettier for code formatting
+- Commit messages follow Conventional Commits specification
+- Ensure code passes all tests and checks
 
-## 📄 开源协议
+### Quick Start
 
-本项目基于 [MIT](LICENSE) 协议开源。
+1. Fork this repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 🙏 致谢
+## 📄 License
 
-- [Transmission](https://transmissionbt.com/) - 优秀的 BitTorrent 客户端
-- [Vue.js](https://vuejs.org/) - 渐进式 JavaScript 框架
-- [Naive UI](https://www.naiveui.com/) - 完整的 Vue 3 组件库
-- [所有贡献者](https://github.com/jianxcao/transmission-web/contributors) - 感谢每一位贡献者
+This project is open source under the [MIT](LICENSE) license, which means you can freely use, modify, and distribute this project.
 
-## 📞 联系方式
+## 🏆 Project Highlights
 
-- 项目主页: https://github.com/jianxcao/transmission-web
-- 问题反馈: https://github.com/jianxcao/transmission-web/issues
-- 功能建议: https://github.com/jianxcao/transmission-web/discussions
+- **🎯 User Experience Focused** - Designed for modern web environments
+- **🚀 Technologically Advanced** - Adopts latest frontend technology stack
+- **📱 Cross-Platform Support** - Perfectly adapted for various devices
+- **⚡ High Performance** - Virtual scrolling technology for big data processing
+- **🔧 Highly Customizable** - Rich personalization options
+- **🌍 Internationalization Support** - Multi-language interface support
+
+## 🙏 Acknowledgments
+
+- [Transmission](https://transmissionbt.com/) - Excellent BitTorrent client
+- [Vue.js](https://vuejs.org/) - Progressive JavaScript framework
+- [Naive UI](https://www.naiveui.com/) - Complete Vue 3 component library
+- [All Contributors](https://github.com/jianxcao/transmission-web/contributors) - Thanks to every contributor
+
+## 📞 Contact
+
+- Project Homepage: https://github.com/jianxcao/transmission-web
+- Issue Reports: https://github.com/jianxcao/transmission-web/issues
+- Feature Suggestions: https://github.com/jianxcao/transmission-web/discussions
 
 ---
 
 <div align="center">
-  如果这个项目对你有帮助，请给我们一个 ⭐ Star！
+  If this project helps you, please give us a ⭐ Star!
 </div>
