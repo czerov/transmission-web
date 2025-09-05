@@ -49,6 +49,7 @@ import {
 import AnyTouchCore from 'any-touch'
 import { useThemeVars } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
+import { getSelectIds } from '../dialog/utils'
 
 const settingStore = useSettingStore()
 const at = new AnyTouchCore(document.body, {
@@ -173,7 +174,7 @@ onUnmounted(() => {
   at.off('tap', closeDropdown)
 })
 async function onDropdownSelect(key: string) {
-  const ids = props.id ? [props.id] : torrentStore.selectedKeys
+  const ids = getSelectIds(props.id ? [props.id] : undefined, torrentStore.selectedKeys)
   if (!ids || ids.length === 0) {
     message.warning(t('messages.pleaseSelectTask'))
     return

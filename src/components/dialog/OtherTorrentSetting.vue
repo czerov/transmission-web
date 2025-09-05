@@ -90,6 +90,7 @@ import { useMessage } from 'naive-ui'
 import { useTorrentStore, useSessionStore } from '@/store'
 import { rpc } from '@/api/rpc'
 import { useI18n } from 'vue-i18n'
+import { getSelectIds } from './utils'
 
 const show = defineModel<boolean>('show', { required: true })
 const message = useMessage()
@@ -133,9 +134,8 @@ const modeOptions = computed(() => [
 
 watch(show, (v) => {
   if (v) {
-    const firstTorrent = torrentStore.torrents.find((t) =>
-      props.ids ? props.ids.includes(t.id) : torrentStore.selectedKeys.includes(t.id)
-    )
+    const ids = getSelectIds(props.ids, torrentStore.selectedKeys)
+    const firstTorrent = torrentStore.torrents.find((t) => ids.includes(t.id))
     formData.honorsSessionLimits = firstTorrent?.honorsSessionLimits || false
     formData.seedIdleLimit = firstTorrent?.seedIdleLimit || 30
     formData.seedIdleMode = firstTorrent?.seedIdleMode || 0

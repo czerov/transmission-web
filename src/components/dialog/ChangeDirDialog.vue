@@ -34,6 +34,7 @@ import { useTorrentStore, useSessionStore } from '@/store'
 import { rpc } from '@/api/rpc'
 import { useI18n } from 'vue-i18n'
 import { useIsSmallScreen } from '@/composables/useIsSmallScreen'
+import { getSelectIds } from './utils'
 const isMobile = useIsSmallScreen()
 const labelType = computed(() => (isMobile.value ? 'top' : 'left'))
 const show = defineModel<boolean>('show', { required: true })
@@ -57,13 +58,14 @@ const downloadDirOptions = computed(() =>
       value: item.key
     }))
 )
+
 watch(
   () => show.value,
   (v) => {
     if (v) {
       moveData.value = true
       // 默认目录为 sessionStore.session?.['download-dir'] 或第一个选中种子的 downloadDir
-      localSelectedKeys.value = props.ids?.length ? props.ids : torrentStore.selectedKeys
+      localSelectedKeys.value = getSelectIds(props.ids, torrentStore.selectedKeys)
       const firstTorrent = torrentStore.torrents.find((t) => localSelectedKeys.value.includes(t.id))
       dir.value = firstTorrent?.downloadDir || sessionStore.session?.['download-dir'] || ''
     } else {

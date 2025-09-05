@@ -27,6 +27,7 @@ import { useTorrentStore } from '@/store'
 import { rpc } from '@/api/rpc'
 import { ensurePathDelimiter, fileSystemSafeName, sleep } from '@/utils'
 import { useI18n } from 'vue-i18n'
+import { getSelectIds } from './utils'
 const show = defineModel<boolean>('show', { required: true })
 const message = useMessage()
 const torrentStore = useTorrentStore()
@@ -48,7 +49,7 @@ watch(
     }
     if (v) {
       // 弹窗打开时快照
-      localSelectedKeys.value = props.ids?.length ? props.ids : torrentStore.selectedKeys
+      localSelectedKeys.value = getSelectIds(props.ids, torrentStore.selectedKeys)
     } else {
       // 弹窗关闭时清空
       localSelectedKeys.value = []
