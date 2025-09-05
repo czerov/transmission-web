@@ -6,14 +6,14 @@ import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import { fileURLToPath, URL } from 'node:url'
 import svgLoader from 'vite-svg-loader'
 import AutoImport from 'unplugin-auto-import/vite'
-
+import fs from 'node:fs'
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
   const base = env.VITE_BASE_URL || ''
 
   // 读取 package.json 中的版本号
-  const packageJson = JSON.parse(require('fs').readFileSync('./package.json', 'utf8'))
+  const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'))
 
   return {
     base: base,

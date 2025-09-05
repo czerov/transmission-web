@@ -102,7 +102,7 @@
     "version": "版本: {version}",
     "clientVersion": "客户端版本: {version}",
     "server": "服务器: {server}",
-    "author": "作者: jianxcao@126.com"
+    "author": "作者"
   },
   "settingsDialog": {
     "title": "参数设置"

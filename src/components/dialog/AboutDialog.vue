@@ -8,7 +8,9 @@
       <div>{{ $t('aboutDialog.version', { version: session?.['version'] ?? '--' }) }}</div>
       <div>{{ $t('aboutDialog.clientVersion', { version: clientVersion }) }}</div>
       <div>{{ $t('aboutDialog.server', { server: serverHost }) }}</div>
-      <a class="mt-2" href="https://github.com/jianxcao/transmission-web">{{ $t('aboutDialog.author') }}</a>
+      <a class="mt-2" href="https://github.com/jianxcao/transmission-web"
+        >{{ $t('aboutDialog.author') }}: jianxcao@126.com</a
+      >
     </div>
     <template #action>
       <n-button type="primary" @click="onUpdateShow(false)">{{ $t('common.close') }}</n-button>

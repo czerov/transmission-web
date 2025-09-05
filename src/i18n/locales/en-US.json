@@ -102,7 +102,7 @@
     "version": "Version: {version}",
     "clientVersion": "Client Version: {version}",
     "server": "Server: {server}",
-    "author": "Author: jianxcao@126.com"
+    "author": "Author"
   },
   "settingsDialog": {
     "title": "Settings"
